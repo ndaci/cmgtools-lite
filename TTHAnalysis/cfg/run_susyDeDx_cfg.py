@@ -3,6 +3,7 @@
 ##########################################################
 import PhysicsTools.HeppyCore.framework.config as cfg
 import re
+import os
 
 #-------- LOAD ALL ANALYZERS -----------
 from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
@@ -81,6 +82,8 @@ from CMGTools.TTHAnalysis.analyzers.treeProducerSusyDeDx import *
 from CMGTools.RootTools.samples.triggers_13TeV_DATA2017 import *
 triggerFlagsAna.triggerBits = {
     'SingleMu' : triggers_1mu_iso,
+    'SingleEl' : triggers_1e_iso + triggers_1e_noniso,
+    'MET'      : triggers_SOS_highMET
 }
 triggerFlagsAna.unrollbits = True
 
@@ -90,6 +93,8 @@ mcSamples = [ W3JetsToLNu_LO ]
 autoAAA(mcSamples)
 for c in mcSamples:
     c.triggers = triggers_1mu_iso
+    c.triggers += triggers_1e_iso + triggers_1e_noniso
+    c.triggers += triggers_SOS_highMET
 
 ## Data
 from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
@@ -140,7 +145,7 @@ if test == "1":
 elif test == "1S":
     comp = selectedComponents[0]
     comp.name = "Signal"
-    comp.files = [ '/afs/cern.ch/work/g/gpetrucc/SusyWithDeDx/CMSSW_9_4_6_patch1/src/MiniAODv2.root' ]
+    comp.files = [ '/media/Disk1/avartak/CMS/Samples/DisappearingTracks/Wino_M_300_cTau_10/Wino_M_300_cTau_10.run21.ev24000.MiniAODv2.root' ]
     selectedComponents = doTest1(comp, sequence=sequence, cache=False )
     print "The test wil use file %s " % comp.files[0]
     ttHJetMETSkim.jetPtCuts = [ ]  # looser than the analysis, to allow for JEC uncertainties

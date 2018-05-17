@@ -85,6 +85,18 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
+
+            # add a flag for bad ECAL channels in the way of the track
+            t.channelsGoodECAL = 1
+            for ie in t.crossedEcalStatus():
+                if ie != 0: t.channelsGoodECAL = 0
+
+            # add a flag for bad HCAL channels in the way of the track
+            t.channelsGoodHCAL = 1
+            for ih in t.crossedHcalStatus():
+                if (ih & (1<<5)) != 0: t.channelsGoodHCAL = 0
+
+
             # add to the list
             event.isoTracks.append(t)
 
