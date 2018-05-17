@@ -3,7 +3,6 @@
 ##########################################################
 import PhysicsTools.HeppyCore.framework.config as cfg
 import re
-import os
 
 #-------- LOAD ALL ANALYZERS -----------
 from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
@@ -145,7 +144,7 @@ if test == "1":
 elif test == "1S":
     comp = selectedComponents[0]
     comp.name = "Signal"
-    comp.files = [ '/media/Disk1/avartak/CMS/Samples/DisappearingTracks/Wino_M_300_cTau_10/Wino_M_300_cTau_10.run21.ev24000.MiniAODv2.root' ]
+    comp.files = [ '/afs/cern.ch/work/g/gpetrucc/SusyWithDeDx/CMSSW_9_4_6_patch1/src/MiniAODv2.root' ]
     selectedComponents = doTest1(comp, sequence=sequence, cache=False )
     print "The test wil use file %s " % comp.files[0]
     ttHJetMETSkim.jetPtCuts = [ ]  # looser than the analysis, to allow for JEC uncertainties
