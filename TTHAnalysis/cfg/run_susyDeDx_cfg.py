@@ -81,6 +81,8 @@ from CMGTools.TTHAnalysis.analyzers.treeProducerSusyDeDx import *
 from CMGTools.RootTools.samples.triggers_13TeV_DATA2017 import *
 triggerFlagsAna.triggerBits = {
     'SingleMu' : triggers_1mu_iso,
+    'SingleEl' : triggers_1e_iso + triggers_1e_noniso,
+    'MET'      : triggers_SOS_highMET
 }
 triggerFlagsAna.unrollbits = True
 
@@ -89,7 +91,9 @@ from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import *
 mcSamples = [ W3JetsToLNu_LO ]
 autoAAA(mcSamples)
 for c in mcSamples:
-    c.triggers = triggers_1mu_iso
+    c.triggers = triggers_1mu_iso[:]
+    c.triggers += triggers_1e_iso + triggers_1e_noniso
+    c.triggers += triggers_SOS_highMET
 
 ## Data
 from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
