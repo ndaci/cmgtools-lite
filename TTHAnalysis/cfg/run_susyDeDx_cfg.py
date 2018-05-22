@@ -28,6 +28,12 @@ jetAnaScaleUp.calculateType1METCorrection = True
 jetAnaScaleDown.calculateType1METCorrection = True
 
 ## early skimming on the isolated track
+from CMGTools.TTHAnalysis.analyzers.ttHFastJetSkimmer import ttHFastJetSkimmer
+fastJetSkim = cfg.Analyzer(ttHFastJetSkimmer, name="fastJetSkimmer",
+    jets = 'slimmedJets',
+    jetCut = lambda j : j.pt() > 80 and abs(j.eta()) < 2.4, # looser pt because of non-final JECs
+    minJets = 1,
+    )
 from CMGTools.TTHAnalysis.analyzers.isoTrackFastSkimmer import isoTrackFastSkimmer
 isoTrackFastSkim = cfg.Analyzer(isoTrackFastSkimmer, name="isoTrackFastSkim",
     cut = lambda t : (t.pt() > 50 and
@@ -90,6 +96,7 @@ sequence = cfg.Sequence( [
     jsonAna,
     triggerAna,
 
+    fastJetSkim,
     isoTrackFastSkim,
 
     genAna,
