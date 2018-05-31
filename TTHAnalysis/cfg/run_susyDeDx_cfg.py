@@ -9,41 +9,25 @@ from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
 from CMGTools.RootTools.samples.configTools import *
 from CMGTools.RootTools.samples.autoAAAconfig import *
 
-#-------- Standard susy setup (useful to get core modules)
-from CMGTools.TTHAnalysis.analyzers.susyCore_modules_cff import *
+from CMGTools.TTHAnalysis.analyzers.xtracks_modules_cff import *
 
-lepAna.doMiniIsolation = "precomputed"
-lepAna.mu_isoCorr = "deltaBeta"
-lepAna.loose_muon_id     = "POG_ID_Loose"
-lepAna.loose_electron_id = "MVA_ID_nonIso_Fall17_Loose"
-lepAna.loose_muon_isoCut     = lambda muon : muon.miniRelIso < 0.4 and muon.sip3D() < 8
-lepAna.loose_electron_isoCut = lambda elec : elec.miniRelIso < 0.4 and elec.sip3D() < 8
+lepAna.loose_muon_isoCut     = lambda muon : muon.relIso03 < 0.25
+lepAna.loose_electron_isoCut = lambda elec : elec.relIso03 < 0.25
 
 tauAna.loose_ptMin = 20
 tauAna.loose_etaMax = 2.3
 tauAna.loose_tauID = "decayModeFindingNewDMs"
-tauAna.loose_vetoLeptons = False # no cleaning with leptons in production
-
-photonAna.do_mc_match = False
+tauAna.loose_vetoLeptons = False 
 
 jetAna.addJECShifts = True
 jetAna.jetPtOrUpOrDnSelection = True
 
-jetAna.copyJetsByValue = True # do not remove this
-metAna.copyMETsByValue = True # do not remove this
+jetAna.copyJetsByValue = True 
 jetAna.calculateType1METCorrection = True
-metAna.recalibrate = "type1"
 jetAnaScaleUp.calculateType1METCorrection = True
-metAnaScaleUp.recalibrate = "type1"
 jetAnaScaleDown.calculateType1METCorrection = True
-metAnaScaleDown.recalibrate = "type1"
 
-## early skimming with loose cuts (before jet-lepton cleaning, re-application of JECs, ...)
-from CMGTools.TTHAnalysis.analyzers.ttHFastMETSkimmer import ttHFastMETSkimmer
-fastMETSkim = cfg.Analyzer( ttHFastMETSkimmer, name='fastMETSkimmer',
-    met      = "slimmedMETs", # met collection to use
-    metCut    =  50,  # MET cut, looser because of non-final JECs
-    )
+## early skimming on the isolated track
 from CMGTools.TTHAnalysis.analyzers.ttHFastJetSkimmer import ttHFastJetSkimmer
 fastJetSkim = cfg.Analyzer(ttHFastJetSkimmer, name="fastJetSkimmer",
     jets = 'slimmedJets',
@@ -52,16 +36,21 @@ fastJetSkim = cfg.Analyzer(ttHFastJetSkimmer, name="fastJetSkimmer",
     )
 from CMGTools.TTHAnalysis.analyzers.isoTrackFastSkimmer import isoTrackFastSkimmer
 isoTrackFastSkim = cfg.Analyzer(isoTrackFastSkimmer, name="isoTrackFastSkim",
-    cut = lambda t : (t.pt() > 50 and 
-                      abs(t.eta()) < 2.4 and 
-                      t.isHighPurityTrack() and 
+    cut = lambda t : (t.pt() > 50 and
+                      abs(t.eta()) < 2.4 and
+                      t.isHighPurityTrack() and
                       abs(t.dxy()) < 0.5 and abs(t.dz()) < 0.5 and
                       (t.miniPFIsolation().chargedHadronIso() < 1.0*t.pt() or t.pt() > 100))
 )
 
-## late skimming (after analyzers have been run)
-ttHJetMETSkim.jetPtCuts = [ 90., ]  # looser than the analysis, to allow for JEC uncertainties
-ttHJetMETSkim.metCut    =   80.
+## late skimming on jets and MET
+from CMGTools.TTHAnalysis.analyzers.xtracksFilters import xtracksFilters
+jetMETSkim = cfg.Analyzer( xtracksFilters, name='xtracksSkim',
+    jets       = "cleanJets",
+    jetPtCuts  = [ 90., ],
+    metCut     =  0,
+    metNoMuCut =  80,
+)
 
 ## Full DeDx analyzer
 from CMGTools.TTHAnalysis.analyzers.isoTrackDeDxAnalyzer import isoTrackDeDxAnalyzer
@@ -74,7 +63,7 @@ isoTrackDeDxAna = cfg.Analyzer(isoTrackDeDxAnalyzer, name="isoTrackDeDxAna",
     )
 
 ## Tree Producer
-from CMGTools.TTHAnalysis.analyzers.treeProducerSusyDeDx import *
+from CMGTools.TTHAnalysis.analyzers.treeProducerXtracks import *
 
 ## Sample production and setup
 ### Trigger
@@ -107,25 +96,22 @@ sequence = cfg.Sequence( [
     jsonAna,
     triggerAna,
 
+    fastJetSkim,
     isoTrackFastSkim,
-    fastMETSkim,
-    fastJetSkim, 
 
     genAna,
     genHFAna,
-    #susyScanAna, # may be needed later
 
     vertexAna,
     lepAna,
     tauAna,
-    photonAna,
     jetAna,
     jetAnaScaleUp,
     jetAnaScaleDown,
     metAna,
     metAnaScaleUp,
     metAnaScaleDown,
-    ttHJetMETSkim,
+    jetMETSkim,
 
     isoTrackDeDxAna,
 
@@ -144,11 +130,9 @@ if test == "1":
 elif test == "1S":
     comp = selectedComponents[0]
     comp.name = "Signal"
-    comp.files = [ '/afs/cern.ch/work/g/gpetrucc/SusyWithDeDx/CMSSW_9_4_6_patch1/src/MiniAODv2.root' ]
+    comp.files = [ '/media/Disk1/avartak/CMS/Samples/DisappearingTracks/Wino_M_300_cTau_10/Wino_M_300_cTau_10.run17.ev17000.MiniAODv2.root' ]
     selectedComponents = doTest1(comp, sequence=sequence, cache=False )
     print "The test wil use file %s " % comp.files[0]
-    ttHJetMETSkim.jetPtCuts = [ ]  # looser than the analysis, to allow for JEC uncertainties
-    ttHJetMETSkim.metCut    =   0.
     fastJetSkim.minJets = 0
     fastMETSkim.metCut = 0
     isoTrackDeDxAna.doDeDx = True
