@@ -41,7 +41,7 @@ triggerFlagsAna = cfg.Analyzer(
     fallbackProcessName = 'HLT2',
     prescaleProcessName = 'PAT',
     prescaleFallbackProcessName = 'RECO',
-    unrollbits = False,
+    unrollbits = True,
     saveIsUnprescaled = False,
     checkL1prescale = False,
     triggerBits = {
@@ -147,11 +147,6 @@ lheWeightAna = cfg.Analyzer(
     useLumiInfo=False
 )
 
-pdfwAna = cfg.Analyzer(
-    PDFWeightsAnalyzer, name="PDFWeightsAnalyzer",
-    PDFWeights = [ pdf for pdf,num in PDFWeights ]
-    )
-
 # Lepton Analyzer (generic)
 lepAna = cfg.Analyzer(
     LeptonAnalyzer, name="leptonAnalyzer",
@@ -178,6 +173,7 @@ lepAna = cfg.Analyzer(
     loose_muon_dxy    = 0.05,
     loose_muon_dz     = 0.1,
     loose_muon_relIso = 1e9,
+    loose_muon_isoCut     = lambda muon : muon.relIso03 < 0.25,
     # inclusive very loose electron selection
     inclusive_electron_id  = "",
     inclusive_electron_pt  = 5,
@@ -192,6 +188,7 @@ lepAna = cfg.Analyzer(
     loose_electron_dxy    = 0.5,
     loose_electron_dz     = 1.0,
     loose_electron_relIso = 1e9,
+    loose_electron_isoCut = lambda elec : elec.relIso03 < 0.25,
     loose_electron_lostHits = 10.0,
     # muon isolation correction method (can be "rhoArea" or "deltaBeta")
     mu_isoCorr = "deltaBeta" ,
@@ -219,8 +216,8 @@ lepAna = cfg.Analyzer(
 tauAna = cfg.Analyzer(
     TauAnalyzer, name="tauAnalyzer",
     # inclusive very loose hadronic tau selection
-    inclusive_ptMin = 18,
-    inclusive_etaMax = 9999,
+    inclusive_ptMin = 20,
+    inclusive_etaMax = 2.3,
     inclusive_dxyMax = 1000.,
     inclusive_dzMax = 0.4,
     inclusive_vetoLeptons = False,
@@ -249,7 +246,7 @@ tauAna = cfg.Analyzer(
 jetAna = cfg.Analyzer(
     JetAnalyzer, name='jetAnalyzer',
     jetCol = 'slimmedJets',
-    copyJetsByValue = False,      #Whether or not to copy the input jets or to work with references (should be 'True' if JetAnalyzer is run more than once)
+    copyJetsByValue = True,      #Whether or not to copy the input jets or to work with references (should be 'True' if JetAnalyzer is run more than once)
     genJetCol = 'slimmedGenJets',
     rho = ('fixedGridRhoFastjetAll','',''),
     jetPt = 25.,
@@ -270,8 +267,8 @@ jetAna = cfg.Analyzer(
     dataGT   = [(1,"Fall17_17Nov2017B_V6_DATA"),(299337,"Fall17_17Nov2017C_V6_DATA"),(302030,"Fall17_17Nov2017D_V6_DATA"),(303435,"Fall17_17Nov2017E_V6_DATA"),(304911,"Fall17_17Nov2017F_V6_DATA")],
     jecPath = "${CMSSW_BASE}/src/CMGTools/RootTools/data/jec/",
     shiftJEC = 0, # set to +1 or -1 to apply +/-1 sigma shift to the nominal jet energies
-    addJECShifts = False, # if true, add  "corr", "corrJECUp", and "corrJECDown" for each jet (requires uncertainties to be available!)
-    jetPtOrUpOrDnSelection = False, # if true, apply pt cut on the maximum among central, JECUp and JECDown values of corrected pt
+    addJECShifts = True, # if true, add  "corr", "corrJECUp", and "corrJECDown" for each jet (requires uncertainties to be available!)
+    jetPtOrUpOrDnSelection = True, # if true, apply pt cut on the maximum among central, JECUp and JECDown values of corrected pt
     smearJets = False,
     shiftJER = 0, # set to +1 or -1 to get +/-1 sigma shifts  
     alwaysCleanPhotons = False,
@@ -283,7 +280,7 @@ jetAna = cfg.Analyzer(
     do_mc_match = True,
     collectionPostFix = "",
     calculateSeparateCorrections = True, # should be True if recalibrateJets is True, otherwise L1s will be inconsistent
-    calculateType1METCorrection  = False,
+    calculateType1METCorrection  = True,
     type1METParams = { 'jetPtThreshold':15., 'skipEMfractionThreshold':0.9, 'skipMuons':True },
     storeLowPtJets = False,
     )
@@ -340,3 +337,94 @@ metAnaScaleDown = metAna.clone(name="metAnalyzerScaleDown",
     collectionPostFix = "_jecDown",
     )
 
+## early skimming on jets
+from CMGTools.TTHAnalysis.analyzers.ttHFastJetSkimmer import ttHFastJetSkimmer
+fastJetSkim = cfg.Analyzer(ttHFastJetSkimmer, name="fastJetSkimmer",
+    jets = 'slimmedJets',
+    jetCut = lambda j : j.pt() > 80 and abs(j.eta()) < 2.4, # looser pt because of non-final JECs
+    minJets = 1,
+    )
+
+## early skimming on isolated tracks
+from CMGTools.TTHAnalysis.analyzers.isoTrackFastSkimmer import isoTrackFastSkimmer
+isoTrackFastSkim = cfg.Analyzer(isoTrackFastSkimmer, name="isoTrackFastSkim",
+    cut = lambda t : (t.pt() > 50 and
+                      abs(t.eta()) < 2.4 and
+                      t.isHighPurityTrack() and
+                      abs(t.dxy()) < 0.5 and abs(t.dz()) < 0.5 and
+                      (t.miniPFIsolation().chargedHadronIso() < 1.0*t.pt() or t.pt() > 100))
+)
+
+## Lepton trigger match (for CR)
+from PhysicsTools.Heppy.analyzers.core.TriggerMatchAnalyzer import TriggerMatchAnalyzer
+lepTrigMatch = cfg.Analyzer(TriggerMatchAnalyzer, name="lepTrigMatch", 
+    processName = 'PAT',
+    fallbackProcessName = 'RECO',
+    unpackPathNames = True,
+    collToMatch = 'selectedLeptons',
+    collMatchSelectors = [ lambda l,t : t.id(83) == (abs(l.pdgId()) == 13) ],
+    trgObjSelectors = [ lambda t : t.path("HLT_IsoMu27_v*",1,0) or 
+                                   t.path("HLT_Ele32_WPTight_Gsf_v*",1,0) or 
+                                   t.path("HLT_Ele35_WPTight_Gsf_v*",1,0) ],
+    label="SingleLep",
+    collMatchDRCut = 0.2,
+    univoqueMatching = True,
+)
+
+## late skimming on jets and MET
+from CMGTools.TTHAnalysis.analyzers.xtracksFilters import xtracksFilters
+eventSkim = cfg.Analyzer( xtracksFilters, name='xtracksSkim',
+    region     = "sr",
+    jets       = "cleanJets",
+    jetPtCuts  = [ 90., ],
+    metCut     =  0,
+    metNoMuCut =  80,
+)
+
+## Full DeDx analyzer
+from CMGTools.TTHAnalysis.analyzers.isoTrackDeDxAnalyzer import isoTrackDeDxAnalyzer
+isoTrackDeDxAna = cfg.Analyzer(isoTrackDeDxAnalyzer, name="isoTrackDeDxAna",
+    doDeDx = "94XMiniAODv1-Hack", 
+        # for 94X MiniAOD v2, just set it to True
+        # for 94X MiniAOD v1, you have two options
+        #  - set it to False, and have no DeDx
+        #  - set it to "94XMiniAODv1-Hack" and follow step (1) of https://hypernews.cern.ch/HyperNews/CMS/get/physTools/3586/1/1/1/1.html 
+    )
+
+
+## Tree Producer
+from CMGTools.TTHAnalysis.analyzers.treeProducerXtracks import *
+
+xtracks_sequence = [
+    lheWeightAna,
+    pileUpAna,
+    skimAnalyzer,
+    jsonAna,
+    triggerAna,
+
+    fastJetSkim,
+    isoTrackFastSkim,
+
+    genAna,
+    genHFAna,
+
+    vertexAna,
+    lepAna,
+    lepTrigMatch,
+    tauAna,
+    jetAna,
+    jetAnaScaleUp,
+    jetAnaScaleDown,
+    metAna,
+    metAnaScaleUp,
+    metAnaScaleDown,
+
+    isoTrackDeDxAna,
+
+    eventSkim,
+
+    triggerFlagsAna,
+    eventFlagsAna,
+    
+    treeProducer,
+]
