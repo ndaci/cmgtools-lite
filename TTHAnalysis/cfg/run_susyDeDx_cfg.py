@@ -29,19 +29,28 @@ triggerFlagsAna.triggerBits = {
 ### MC
 from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import *
 Top = [ TTLep_pow, TTSemi_pow, T_tch, TBar_tch, T_tWch_noFullyHad, TBar_tWch_noFullyHad ]
+
+Wino_M_300_cTau_3  = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_3",  "Wino_M_300_cTau_3",  "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_300_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_10", "Wino_M_300_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_300_cTau_30 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_30", "Wino_M_300_cTau_30", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_500_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_500_cTau_10", "Wino_M_500_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_500_cTau_10 ]
+
 if region == "sr":   
     mcSamples = ([ W3JetsToLNu_LO, W1JetsToLNu_LO, W2JetsToLNu_LO, W4JetsToLNu_LO ]
                  + DYJetsToLLM50HT + DYJetsToLLM4to50HT
                  + ZvvLOHT 
                  + Top )
+    mcSignals = Winos
     mcTriggers = triggers_SOS_highMET[:] 
 elif region == "cr1l": 
     mcSamples = [ DYJetsToLL_M50, WJetsToLNu_LO ] + Top
     mcTriggers = triggers_1mu_iso + triggers_1e_iso + triggers_1e_noniso
+    mcSignals = []
 
 autoAAA(mcSamples)
 cropToLumi(mcSamples, 10*41.7)
-for c in mcSamples:
+for c in mcSamples + mcSignals:
     c.triggers = mcTriggers
 
 ## Data
@@ -63,9 +72,10 @@ for (pdname, trigs) in datasetsAndTriggers:
     vetoTriggers += trigs
 
 run = getHeppyOption("run","all")
-if run == "all":    selectedComponents = mcSamples + dataSamples
+if run == "all":    selectedComponents = mcSamples + dataSamples + mcSignals
 elif run == "data": selectedComponents = dataSamples
 elif run == "mc":   selectedComponents = mcSamples
+elif run == "sig":  selectedComponents = mcSignals
 
 
 #-------- SEQUENCE -----------
@@ -84,7 +94,6 @@ elif test == "1S":
     selectedComponents = doTest1(comp, sequence=sequence, cache=False )
     print "The test wil use file %s " % comp.files[0]
     fastJetSkim.minJets = 0
-    fastMETSkim.metCut = 0
     isoTrackDeDxAna.doDeDx = True
     comp.triggers = []
 elif test in ('2','3','5s'):
