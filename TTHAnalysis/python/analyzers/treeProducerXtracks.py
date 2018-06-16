@@ -102,6 +102,8 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("closestEle_idx", lambda x : x.closestEle.index if x.closestEle else -1, int),
     NTupleVariable("closestTau_idx", lambda x : x.closestTau.index if x.closestTau else -1, int),
 
+    NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
+
     NTupleVariable("myDeDx", lambda x : x.myDeDx),
 
     NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True),
