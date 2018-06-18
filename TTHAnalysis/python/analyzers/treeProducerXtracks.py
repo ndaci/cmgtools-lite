@@ -56,7 +56,8 @@ metTypeXtracksBasic = NTupleObjectType("metXtracksBasic", baseObjectTypes = [ fo
 
 ##------------------------------------------  
 ## IsoTrackDeDx
-##------------------------------------------  
+##------------------------------------------
+
 isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ particleType ], variables = [
     NTupleVariable("charge",   lambda x : x.charge(), int),
     NTupleVariable("dxy",   lambda x : x.dxy(), help="d_{xy} with respect to PV, in cm (with sign)"),
@@ -105,9 +106,16 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
 
     NTupleVariable("myDeDx", lambda x : x.myDeDx),
-
-    NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True),
-])
+    NTupleVariable("deDxByLayer0", lambda x : x.deDxByLayer0),
+    NTupleVariable("deDxByLayer1", lambda x : x.deDxByLayer1),
+    NTupleVariable("deDxByLayer2", lambda x : x.deDxByLayer2),
+    NTupleVariable("deDxByLayer3", lambda x : x.deDxByLayer3),
+    NTupleVariable("deDxByLayer4", lambda x : x.deDxByLayer4),
+    NTupleVariable("deDxByLayer5", lambda x : x.deDxByLayer5),
+                                                                                                         
+    NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True)
+]
+)
 
 ##------------------------------------------  
 ## genCharginoType

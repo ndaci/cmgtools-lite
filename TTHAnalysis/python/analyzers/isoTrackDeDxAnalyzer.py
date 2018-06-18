@@ -58,6 +58,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             getDeDxRef = fixed.get
         
         event.isoTracks = []
+        
         for t in event.preselIsoTracks:
             # add more variables
             t.leadAwayJet = leading(cleaned(t,  event.cleanJets, 0.4))
@@ -68,6 +69,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestMu   = closest(t, nearby(t, muons, 0.4))
             t.closestEle  = closest(t, nearby(t, electrons, 0.4))
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
+
             # get dedx
             if self.cfg_ana.doDeDx:
                 ref = getDeDxRef(t.index)
@@ -76,15 +78,31 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                     continue
                 dedx = ref.get(); 
                 nhits = dedx.size()
+                
                 # this below is just dummy to give you a template
                 mysum = 0
+                t.deDxByLayer0 = 0
+                t.deDxByLayer1 = 0
+                t.deDxByLayer2 = 0
+                t.deDxByLayer3 = 0
+                t.deDxByLayer4 = 0
+                t.deDxByLayer5 = 0
+                
                 for ih in xrange(dedx.size()):
                     pxclust = dedx.pixelCluster(ih)
                     if not pxclust: continue
+                    if ih==0: t.deDxByLayer0 = pxclust.charge()
+                    if ih==1: t.deDxByLayer1 = pxclust.charge()
+                    if ih==2: t.deDxByLayer2 = pxclust.charge()
+                    if ih==3: t.deDxByLayer3 = pxclust.charge()
+                    if ih==4: t.deDxByLayer4 = pxclust.charge()
+                    if ih==5: t.deDxByLayer5 = pxclust.charge()
+
                     mysum += pxclust.charge()
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
+
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
