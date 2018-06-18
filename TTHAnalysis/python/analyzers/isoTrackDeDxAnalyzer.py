@@ -70,6 +70,9 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestEle  = closest(t, nearby(t, electrons, 0.4))
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
+            dedxArray = []
+            
+
             # get dedx
             if self.cfg_ana.doDeDx:
                 ref = getDeDxRef(t.index)
@@ -79,30 +82,22 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 dedx = ref.get(); 
                 nhits = dedx.size()
                 
+                for i in xrange(100): dedxArray.append(0)
                 # this below is just dummy to give you a template
                 mysum = 0
-                t.deDxByLayer0 = 0
-                t.deDxByLayer1 = 0
-                t.deDxByLayer2 = 0
-                t.deDxByLayer3 = 0
-                t.deDxByLayer4 = 0
-                t.deDxByLayer5 = 0
                 
-                for ih in xrange(dedx.size()):
+                for ih in xrange(nhits):
                     pxclust = dedx.pixelCluster(ih)
                     if not pxclust: continue
-                    if ih==0: t.deDxByLayer0 = pxclust.charge()
-                    if ih==1: t.deDxByLayer1 = pxclust.charge()
-                    if ih==2: t.deDxByLayer2 = pxclust.charge()
-                    if ih==3: t.deDxByLayer3 = pxclust.charge()
-                    if ih==4: t.deDxByLayer4 = pxclust.charge()
-                    if ih==5: t.deDxByLayer5 = pxclust.charge()
+                    dedxArray[ih] = pxclust.charge()
 
                     mysum += pxclust.charge()
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
 
+
+            t.dedxByLayer = dedxArray
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
