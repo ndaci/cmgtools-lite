@@ -71,7 +71,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
             dedxArray = []
-            
+            for i in xrange(100): dedxArray.append(0)
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -82,7 +82,6 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 dedx = ref.get(); 
                 nhits = dedx.size()
                 
-                for i in xrange(100): dedxArray.append(0)
                 # this below is just dummy to give you a template
                 mysum = 0
                 

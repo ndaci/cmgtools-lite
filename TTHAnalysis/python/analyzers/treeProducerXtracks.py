@@ -106,12 +106,12 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
 
     NTupleVariable("myDeDx", lambda x : x.myDeDx),
-    NTupleVariable("dedxByLayer[0]", lambda x : x.dedxByLayer[0]),
-    NTupleVariable("dedxByLayer[1]", lambda x : x.dedxByLayer[1]),
-    NTupleVariable("dedxByLayer[2]", lambda x : x.dedxByLayer[2]),
-    NTupleVariable("dedxByLayer[3]", lambda x : x.dedxByLayer[3]),
-    NTupleVariable("dedxByLayer[4]", lambda x : x.dedxByLayer[4]),
-    NTupleVariable("dedxByLayer[5]", lambda x : x.dedxByLayer[5]),
+    NTupleVariable("dedxByLayer0", lambda x : x.dedxByLayer[0]),
+    NTupleVariable("dedxByLayer1", lambda x : x.dedxByLayer[1]),
+    NTupleVariable("dedxByLayer2", lambda x : x.dedxByLayer[2]),
+    NTupleVariable("dedxByLayer3", lambda x : x.dedxByLayer[3]),
+    NTupleVariable("dedxByLayer4", lambda x : x.dedxByLayer[4]),
+    NTupleVariable("dedxByLayer5", lambda x : x.dedxByLayer[5]),
                                                                                                        
     NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True)
 ]
