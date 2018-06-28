@@ -9,57 +9,55 @@ from math import *
 ## LEPTON
 ##------------------------------------------  
 
-leptonTypeSusy = NTupleObjectType("leptonSusy", baseObjectTypes = [ leptonType ], variables = [
-    NTupleVariable("mvaIdFall17noIso",   lambda lepton : lepton.mvaRun2("Fall17noIso") if abs(lepton.pdgId()) == 11 else 1, help="EGamma POG MVA ID, Fall17 training, without isolation; 1 for muons"),
+leptonTypeXtracks = NTupleObjectType("leptonXtracks", baseObjectTypes = [ leptonType ], variables = [
     NTupleVariable("etaSc", lambda x : x.superCluster().eta() if abs(x.pdgId())==11 else -100, help="Electron supercluster pseudorapidity"),
-    # More: MC
     NTupleVariable("mcMatchPdgId",  lambda x : x.mcLep.pdgId() if getattr(x,'mcLep',None)!=None else -99, int, mcOnly=True, help="Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z): pdgId of the matched gen-level lepton, zero if non-prompt or fake"),
     NTupleVariable("mcPromptGamma", lambda x : x.mcPho.isPromptFinalState() if getattr(x,"mcPho",None) else 0, int, mcOnly=True, help="Photon isPromptFinalState"),
 ])
-leptonTypeSusy.removeVariable("relIsoAn04")
-leptonTypeSusy.removeVariable("eleCutIdSpring15_25ns_v1")
-leptonTypeSusy.removeVariable("ICHEPsoftMuonId")
-leptonTypeSusy.removeVariable("ICHEPmediumMuonId")
+leptonTypeXtracks.removeVariable("relIsoAn04")
+leptonTypeXtracks.removeVariable("eleCutIdSpring15_25ns_v1")
+leptonTypeXtracks.removeVariable("ICHEPsoftMuonId")
+leptonTypeXtracks.removeVariable("ICHEPmediumMuonId")
 
 ##------------------------------------------  
 ## TAU
 ##------------------------------------------  
 
-tauTypeSusy = NTupleObjectType("tauSusy",  baseObjectTypes = [ tauType ], variables = [
+tauTypeXtracks = NTupleObjectType("tauXtracks",  baseObjectTypes = [ tauType ], variables = [
      NTupleVariable("idMVAdR03", lambda x : x.idMVAdR03, int, help="1,2,3,4,5,6 if the tau passes the very loose to very very tight WP of the IsolationMVArun2v1DBdR03oldDMwLT discriminator"),
 ])
-tauTypeSusy.removeVariable("idMVANewDM")
-tauTypeSusy.removeVariable("idCI3hit")
+tauTypeXtracks.removeVariable("idMVANewDM")
+tauTypeXtracks.removeVariable("idCI3hit")
 
 
-jetTypeSusy = NTupleObjectType("jetSusy",  baseObjectTypes = [ jetTypeExtra ], variables = [
-#   NTupleVariable("charge", lambda x : x.jetCharge(), float, help="Jet charge"), 
-#    NTupleVariable("btagDeepCSVCvsB", lambda x : (lambda y : -99 if isnan(y) else y)(x.btag('pfDeepCSVJetTags:probc')/(x.btag('pfDeepCSVJetTags:probc')+x.btag('pfDeepCSVJetTags:probb')+x.btag('pfDeepCSVJetTags:probbb'))), help="DeepCSV discriminator, CvsB = c/(c+b+bb)"),
-#    NTupleVariable("btagDeepCSVCvsL", lambda x : (lambda y : -99 if isnan(y) else y)(x.btag('pfDeepCSVJetTags:probc')/(x.btag('pfDeepCSVJetTags:probc')+x.btag('pfDeepCSVJetTags:probudsg'))), help="DeepCSV discriminator, CvsL = c/(c+udsg)"),
-#    NTupleVariable("ctagCsvL", lambda x : x.btag('pfCombinedCvsLJetTags'), float, help="CsvL discriminator"),
-#    NTupleVariable("chHEF", lambda x : x.chargedHadronEnergyFraction(), float, mcOnly = False, help="chargedHadronEnergyFraction (relative to uncorrected jet energy)"),
-#    NTupleVariable("neHEF", lambda x : x.neutralHadronEnergyFraction(), float, mcOnly = False,help="neutralHadronEnergyFraction (relative to uncorrected jet energy)"),
+jetTypeXtracks = NTupleObjectType("jetXtracks",  baseObjectTypes = [ jetTypeExtra ], variables = [
+    NTupleVariable("chHEF", lambda x : x.chargedHadronEnergyFraction(), float, mcOnly = False, help="chargedHadronEnergyFraction (relative to uncorrected jet energy)"),
+    NTupleVariable("neHEF", lambda x : x.neutralHadronEnergyFraction(), float, mcOnly = False,help="neutralHadronEnergyFraction (relative to uncorrected jet energy)"),
 ])
-jetTypeSusy.removeVariable("btagCMVA")
-jetTypeSusy.removeVariable("nLeptons")
+jetTypeXtracks.removeVariable("btagCMVA")
+jetTypeXtracks.removeVariable("nLeptons")
 
-jetTypeSusyFwd = NTupleObjectType("jetFwd",  baseObjectTypes = [ jetType ], variables = [
-#    NTupleVariable("chHEF", lambda x : x.chargedHadronEnergyFraction(), float, mcOnly = False, help="chargedHadronEnergyFraction (relative to uncorrected jet energy)"),
-#    NTupleVariable("neHEF", lambda x : x.neutralHadronEnergyFraction(), float, mcOnly = False,help="neutralHadronEnergyFraction (relative to uncorrected jet energy)"),
+jetTypeXtracksFwd = NTupleObjectType("jetFwd",  baseObjectTypes = [ jetType ], variables = [
+    NTupleVariable("chHEF", lambda x : x.chargedHadronEnergyFraction(), float, mcOnly = False, help="chargedHadronEnergyFraction (relative to uncorrected jet energy)"),
+    NTupleVariable("neHEF", lambda x : x.neutralHadronEnergyFraction(), float, mcOnly = False,help="neutralHadronEnergyFraction (relative to uncorrected jet energy)"),
 ])
-jetTypeSusy.removeVariable("btagCMVA")
-jetTypeSusyFwd.removeVariable("nLeptons")
+jetTypeXtracks.removeVariable("btagCMVA")
+jetTypeXtracksFwd.removeVariable("nLeptons")
 
 ##------------------------------------------  
 ## MET
 ##------------------------------------------  
   
-metTypeSusy = NTupleObjectType("metSusy", baseObjectTypes = [ metType ], variables = [
+metTypeXtracks = NTupleObjectType("metXtracks", baseObjectTypes = [ metType ], variables = [
+])
+
+metTypeXtracksBasic = NTupleObjectType("metXtracksBasic", baseObjectTypes = [ fourVectorType ], variables = [
 ])
 
 ##------------------------------------------  
 ## IsoTrackDeDx
-##------------------------------------------  
+##------------------------------------------
+
 isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ particleType ], variables = [
     NTupleVariable("charge",   lambda x : x.charge(), int),
     NTupleVariable("dxy",   lambda x : x.dxy(), help="d_{xy} with respect to PV, in cm (with sign)"),
@@ -99,16 +97,25 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
 
     NTupleVariable("awayEle_idx", lambda x : x.leadAwayEle.index if x.leadAwayEle else -1, int),
     NTupleVariable("awayEle_dr", lambda x : deltaR(x, x.leadAwayEle) if x.leadAwayEle else 0),
-    NTupleVariable("awayEle_mll", lambda x : (ROOT.reco.Candidate.p4(x.leadAwayEle)+x.p4()).M() if x.leadAwayEle else 0),
+    NTupleVariable("awayEle_mll", lambda x : (x.leadAwayEle.p4()+x.p4()).M() if x.leadAwayEle else 0),
 
     NTupleVariable("closestMu_idx", lambda x : x.closestMu.index if x.closestMu else -1, int),
     NTupleVariable("closestEle_idx", lambda x : x.closestEle.index if x.closestEle else -1, int),
     NTupleVariable("closestTau_idx", lambda x : x.closestTau.index if x.closestTau else -1, int),
 
-    NTupleVariable("myDeDx", lambda x : x.myDeDx),
+    NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
 
-    NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True),
-])
+    NTupleVariable("myDeDx", lambda x : x.myDeDx),
+    NTupleVariable("dedxByLayer0", lambda x : x.dedxByLayer[0]),
+    NTupleVariable("dedxByLayer1", lambda x : x.dedxByLayer[1]),
+    NTupleVariable("dedxByLayer2", lambda x : x.dedxByLayer[2]),
+    NTupleVariable("dedxByLayer3", lambda x : x.dedxByLayer[3]),
+    NTupleVariable("dedxByLayer4", lambda x : x.dedxByLayer[4]),
+    NTupleVariable("dedxByLayer5", lambda x : x.dedxByLayer[5]),
+                                                                                                       
+    NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True)
+]
+)
 
 ##------------------------------------------  
 ## genCharginoType
@@ -121,7 +128,7 @@ genCharginoType  = NTupleObjectType("genCharginoType", baseObjectTypes = [ genPa
 
 ## Tree Producer
 treeProducer = cfg.Analyzer(
-    AutoFillTreeProducer, name='treeProducerSusyDeDx',
+    AutoFillTreeProducer, name='treeProducerXtracks',
     vectorTree = True, saveTLorentzVectors = False,  defaultFloatType = 'F', PDFWeights = [],
     globalVariables = [
         NTupleVariable("rho",  lambda ev: ev.rho, float, help="kt6PFJets rho"),
@@ -135,17 +142,20 @@ treeProducer = cfg.Analyzer(
         NTupleVariable("lheHTIncoming", lambda ev : getattr(ev,"lheHTIncoming",-999), mcOnly=True, help="H_{T} computed from quarks and gluons in Heppy LHEAnalyzer (only LHE status<0 as mothers)"),
         ],
     globalObjects = {
-        "met"         : NTupleObject("met", metTypeSusy, help="PF E_{T}^{miss}"),
-        "met_jecUp"   : NTupleObject("met_jecUp", metTypeSusy, help="PF E_{T}^{miss}, after type 1 corrections (JEC plus 1sigma)"),
-        "met_jecDown" : NTupleObject("met_jecDown", metTypeSusy, help="PF E_{T}^{miss}, after type 1 corrections (JEC minus 1sigma)"),
+        "met"             : NTupleObject("met", metTypeXtracks, help="PF E_{T}^{miss}"),
+        "metNoMu"         : NTupleObject("metNoMu", metTypeXtracksBasic, help="PF E_{T}^{miss} without muons"),
+        "met_jecUp"       : NTupleObject("met_jecUp", metTypeXtracks, help="PF E_{T}^{miss}, after type 1 corrections (JEC plus 1sigma)"),
+        "metNoMu_jecUp"   : NTupleObject("metNoMu_jecUp", metTypeXtracksBasic, help="PF E_{T}^{miss} without muons, after type 1 corrections (JEC plus 1sigma)"),
+        "met_jecDown"     : NTupleObject("met_jecDown", metTypeXtracks, help="PF E_{T}^{miss}, after type 1 corrections (JEC minus 1sigma)"),
+        "metNoMu_jecDown" : NTupleObject("metNoMu_jecUp", metTypeXtracksBasic, help="PF E_{T}^{miss} without muons, after type 1 corrections (JEC minus 1sigma)"),
         },
     collections = {
         ##--------------------------------------------------
-        "selectedTaus"    : NTupleCollection("TauGood",  tauTypeSusy, 8, help="Taus after the preselection"),
-        "selectedLeptons" : NTupleCollection("LepGood",  leptonTypeSusy, 8, help="Leptons after the preselection"),
+        "selectedTaus"    : NTupleCollection("TauGood",  tauTypeXtracks, 8, help="Taus after the preselection"),
+        "selectedLeptons" : NTupleCollection("LepGood",  leptonTypeXtracks, 8, help="Leptons after the preselection"),
         ##------------------------------------------------
-        "cleanJets"       : NTupleCollection("Jet",     jetTypeSusy, 15, help="Cental jets after full selection and cleaning, sorted by pt"),
-        "cleanJetsFwd"    : NTupleCollection("JetFwd",  jetTypeSusyFwd,  6, help="Forward jets after full selection and cleaning, sorted by pt"),
+        "cleanJets"       : NTupleCollection("Jet",     jetTypeXtracks, 15, help="Cental jets after full selection and cleaning, sorted by pt"),
+        "cleanJetsFwd"    : NTupleCollection("JetFwd",  jetTypeXtracksFwd,  6, help="Forward jets after full selection and cleaning, sorted by pt"),
         ##------------------------------------------------
         "isoTracks"       : NTupleCollection("IsoTrack",  isoTrackTypeDeDx, 4, help="Isolated tracks"),
         ##------------------------------------------------
