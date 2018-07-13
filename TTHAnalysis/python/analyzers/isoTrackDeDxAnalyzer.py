@@ -89,17 +89,17 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 mysum = 0
                 
                 for ih in xrange(nhits):
-                    pxclust = dedx.pixelCluster(ih)
-                    if not pxclust: continue
-                    
-                    dedxArray[ih] = pxclust.charge()/dedx.pathlength(ih)
-                    
-                    # convert number of electrons to MeV
-                    if ih < 5: dedxArray[ih] *= pixelChargeToEnergyCoefficient
-                    else:      dedxArray[ih] *= stripChargeToEnergyCoefficient
-                
-
-                    mysum += pxclust.charge()
+                    pixelCluster = dedx.pixelCluster(ih)
+                    stripCluster = dedx.stripCluster(ih)
+                    if pixelCluster:
+                      dedxArray[ih] = pixelCluster.charge()/dedx.pathlength(ih)
+                      # convert number of electrons to MeV
+                      dedxArray[ih] *= pixelChargeToEnergyCoefficient
+                      mysum += pixelCluster.charge()
+                    if stripCluster:
+                      dedxArray[ih] = stripCluster.charge()/dedx.pathlength(ih)
+                      # convert number of electrons to MeV
+                      dedxArray[ih] *= stripChargeToEnergyCoefficient
 
                 t.myDeDx = mysum
             else:
