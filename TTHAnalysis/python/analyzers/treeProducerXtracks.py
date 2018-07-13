@@ -120,6 +120,22 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("dedxByLayer11", lambda x : x.dedxByLayer[11]),
     NTupleVariable("dedxByLayer12", lambda x : x.dedxByLayer[12]),
     NTupleVariable("dedxByLayer13", lambda x : x.dedxByLayer[13]),
+    
+    NTupleVariable("subDetIdByLayer0", lambda x : x.subDetIdByLayer[0], int),
+    NTupleVariable("subDetIdByLayer1", lambda x : x.subDetIdByLayer[1], int),
+    NTupleVariable("subDetIdByLayer2", lambda x : x.subDetIdByLayer[2], int),
+    NTupleVariable("subDetIdByLayer3", lambda x : x.subDetIdByLayer[3], int),
+    NTupleVariable("subDetIdByLayer4", lambda x : x.subDetIdByLayer[4], int),
+    NTupleVariable("subDetIdByLayer5", lambda x : x.subDetIdByLayer[5], int),
+    NTupleVariable("subDetIdByLayer6", lambda x : x.subDetIdByLayer[6], int),
+    NTupleVariable("subDetIdByLayer7", lambda x : x.subDetIdByLayer[7], int),
+    NTupleVariable("subDetIdByLayer8", lambda x : x.subDetIdByLayer[8], int),
+    NTupleVariable("subDetIdByLayer9", lambda x : x.subDetIdByLayer[9], int),
+    NTupleVariable("subDetIdByLayer10", lambda x : x.subDetIdByLayer[10], int),
+    NTupleVariable("subDetIdByLayer11", lambda x : x.subDetIdByLayer[11], int),
+    NTupleVariable("subDetIdByLayer12", lambda x : x.subDetIdByLayer[12], int),
+    NTupleVariable("subDetIdByLayer13", lambda x : x.subDetIdByLayer[13], int),
+                                                                                                         
                                                                                                          
     NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True)
 ]

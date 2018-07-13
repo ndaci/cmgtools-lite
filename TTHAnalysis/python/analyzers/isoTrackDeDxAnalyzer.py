@@ -76,6 +76,9 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             dedxArray = []
             for i in xrange(100): dedxArray.append(0)
 
+            subDetIdArray = []
+            for i in xrange(100): subDetIdArray.append(0)
+
             # get dedx
             if self.cfg_ana.doDeDx:
                 ref = getDeDxRef(t.index)
@@ -100,6 +103,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                       dedxArray[ih] = stripCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
                       dedxArray[ih] *= stripChargeToEnergyCoefficient
+                    subDetIdArray[ih] = dedx.detId(ih).subdetId()
 
                 t.myDeDx = mysum
             else:
@@ -107,6 +111,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
 
 
             t.dedxByLayer = dedxArray
+            t.subDetIdByLayer = subDetIdArray
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
