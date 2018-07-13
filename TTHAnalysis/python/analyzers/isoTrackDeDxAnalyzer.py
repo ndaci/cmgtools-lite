@@ -88,7 +88,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 for ih in xrange(nhits):
                     pxclust = dedx.pixelCluster(ih)
                     if not pxclust: continue
-                    dedxArray[ih] = pxclust.charge()
+                    dedxArray[ih] = pxclust.charge()/dedx.pathlength(ih)
 
                     mysum += pxclust.charge()
                 t.myDeDx = mysum
