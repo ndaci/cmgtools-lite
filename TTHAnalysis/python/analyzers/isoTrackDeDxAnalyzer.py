@@ -59,6 +59,9 @@ class isoTrackDeDxAnalyzer( Analyzer ):
         
         event.isoTracks = []
         
+        pixelChargeToEnergyCoefficient = 3.61e-6
+        stripChargeToEnergyCoefficient = 3.61e-6 * 265
+        
         for t in event.preselIsoTracks:
             # add more variables
             t.leadAwayJet = leading(cleaned(t,  event.cleanJets, 0.4))
@@ -88,9 +91,16 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 for ih in xrange(nhits):
                     pxclust = dedx.pixelCluster(ih)
                     if not pxclust: continue
+                    
                     dedxArray[ih] = pxclust.charge()/dedx.pathlength(ih)
+                    
+                    # convert number of electrons to MeV
+                    if ih < 5: dedxArray[ih] *= pixelChargeToEnergyCoefficient
+                    else:      dedxArray[ih] *= stripChargeToEnergyCoefficient
+                
 
                     mysum += pxclust.charge()
+
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
