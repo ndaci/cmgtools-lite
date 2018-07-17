@@ -74,10 +74,15 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
             dedxArray = []
-            for i in xrange(100): dedxArray.append(0)
-
             subDetIdArray = []
-            for i in xrange(100): subDetIdArray.append(0)
+            sizeXarray = []
+            sizeYarray = []
+            
+            for i in xrange(100):
+              dedxArray.append(0)
+              subDetIdArray.append(0)
+              sizeXarray.append(0)
+              sizeYarray.append(0)
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -98,6 +103,10 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                       dedxArray[ih] = pixelCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
                       dedxArray[ih] *= pixelChargeToEnergyCoefficient
+                      
+                      sizeXarray[ih] = pixelCluster.sizeX()
+                      sizeYarray[ih] = pixelCluster.sizeY()
+                      
                       mysum += pixelCluster.charge()
                     if stripCluster:
                       dedxArray[ih] = stripCluster.charge()/dedx.pathlength(ih)
@@ -112,6 +121,8 @@ class isoTrackDeDxAnalyzer( Analyzer ):
 
             t.dedxByLayer = dedxArray
             t.subDetIdByLayer = subDetIdArray
+            t.sizeXbyLayer = sizeXarray
+            t.sizeYbyLayer = sizeYarray
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
