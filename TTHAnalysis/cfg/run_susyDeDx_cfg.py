@@ -2,134 +2,84 @@
 ##       CONFIGURATION FOR SUSY STOP SOFT B TREES       ##
 ##########################################################
 import PhysicsTools.HeppyCore.framework.config as cfg
-import re
+import re, sys
 
 #-------- LOAD ALL ANALYZERS -----------
 from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
 from CMGTools.RootTools.samples.configTools import *
 from CMGTools.RootTools.samples.autoAAAconfig import *
 
-#-------- Standard susy setup (useful to get core modules)
-from CMGTools.TTHAnalysis.analyzers.susyCore_modules_cff import *
+from CMGTools.TTHAnalysis.analyzers.xtracks_modules_cff import *
 
-lepAna.doMiniIsolation = "precomputed"
-lepAna.mu_isoCorr = "deltaBeta"
-lepAna.loose_muon_id     = "POG_ID_Loose"
-lepAna.loose_electron_id = "MVA_ID_nonIso_Fall17_Loose"
-lepAna.loose_muon_isoCut     = lambda muon : muon.miniRelIso < 0.4 and muon.sip3D() < 8
-lepAna.loose_electron_isoCut = lambda elec : elec.miniRelIso < 0.4 and elec.sip3D() < 8
+## Configuration that depends on the region
+region = getHeppyOption("region","sr") # use 'sr' or "cr1l"
 
-tauAna.loose_ptMin = 20
-tauAna.loose_etaMax = 2.3
-tauAna.loose_tauID = "decayModeFindingNewDMs"
-tauAna.loose_vetoLeptons = False # no cleaning with leptons in production
-
-photonAna.do_mc_match = False
-
-jetAna.addJECShifts = True
-jetAna.jetPtOrUpOrDnSelection = True
-
-jetAna.copyJetsByValue = True # do not remove this
-metAna.copyMETsByValue = True # do not remove this
-jetAna.calculateType1METCorrection = True
-metAna.recalibrate = "type1"
-jetAnaScaleUp.calculateType1METCorrection = True
-metAnaScaleUp.recalibrate = "type1"
-jetAnaScaleDown.calculateType1METCorrection = True
-metAnaScaleDown.recalibrate = "type1"
-
-## early skimming with loose cuts (before jet-lepton cleaning, re-application of JECs, ...)
-from CMGTools.TTHAnalysis.analyzers.ttHFastMETSkimmer import ttHFastMETSkimmer
-fastMETSkim = cfg.Analyzer( ttHFastMETSkimmer, name='fastMETSkimmer',
-    met      = "slimmedMETs", # met collection to use
-    metCut    =  50,  # MET cut, looser because of non-final JECs
-    )
-from CMGTools.TTHAnalysis.analyzers.ttHFastJetSkimmer import ttHFastJetSkimmer
-fastJetSkim = cfg.Analyzer(ttHFastJetSkimmer, name="fastJetSkimmer",
-    jets = 'slimmedJets',
-    jetCut = lambda j : j.pt() > 80 and abs(j.eta()) < 2.4, # looser pt because of non-final JECs
-    minJets = 1,
-    )
-from CMGTools.TTHAnalysis.analyzers.isoTrackFastSkimmer import isoTrackFastSkimmer
-isoTrackFastSkim = cfg.Analyzer(isoTrackFastSkimmer, name="isoTrackFastSkim",
-    cut = lambda t : (t.pt() > 50 and 
-                      abs(t.eta()) < 2.4 and 
-                      t.isHighPurityTrack() and 
-                      abs(t.dxy()) < 0.5 and abs(t.dz()) < 0.5 and
-                      (t.miniPFIsolation().chargedHadronIso() < 1.0*t.pt() or t.pt() > 100))
-)
-
-## late skimming (after analyzers have been run)
-ttHJetMETSkim.jetPtCuts = [ 90., ]  # looser than the analysis, to allow for JEC uncertainties
-ttHJetMETSkim.metCut    =   80.
-
-## Full DeDx analyzer
-from CMGTools.TTHAnalysis.analyzers.isoTrackDeDxAnalyzer import isoTrackDeDxAnalyzer
-isoTrackDeDxAna = cfg.Analyzer(isoTrackDeDxAnalyzer, name="isoTrackDeDxAna",
-    doDeDx = "94XMiniAODv1-Hack", 
-        # for 94X MiniAOD v2, just set it to True
-        # for 94X MiniAOD v1, you have two options
-        #  - set it to False, and have no DeDx
-        #  - set it to "94XMiniAODv1-Hack" and follow step (1) of https://hypernews.cern.ch/HyperNews/CMS/get/physTools/3586/1/1/1/1.html 
-    )
-
-## Tree Producer
-from CMGTools.TTHAnalysis.analyzers.treeProducerSusyDeDx import *
+fastJetSkim.minJets = 1 if region =="sr" else 0
+eventSkim.region = region
 
 ## Sample production and setup
 ### Trigger
 from CMGTools.RootTools.samples.triggers_13TeV_DATA2017 import *
 triggerFlagsAna.triggerBits = {
     'SingleMu' : triggers_1mu_iso,
+    'SingleEl' : triggers_1e_iso + triggers_1e_noniso,
+    'MET'      : triggers_SOS_highMET
 }
-triggerFlagsAna.unrollbits = True
 
 ### MC
 from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import *
-mcSamples = [ W3JetsToLNu_LO ]
+Top = [ TTLep_pow, TTSemi_pow, T_tch, TBar_tch, T_tWch_noFullyHad, TBar_tWch_noFullyHad ]
+
+Wino_M_300_cTau_3  = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_3",  "Wino_M_300_cTau_3",  "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_300_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_10", "Wino_M_300_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_300_cTau_30 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_30", "Wino_M_300_cTau_30", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_500_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_500_cTau_10", "Wino_M_500_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_500_cTau_10 ]
+
+if region == "sr":   
+    mcSamples = ([ W3JetsToLNu_LO, W1JetsToLNu_LO, W2JetsToLNu_LO, W4JetsToLNu_LO ]
+                 + DYJetsToLLM50HT + DYJetsToLLM4to50HT
+                 + ZvvLOHT 
+                 + Top )
+    mcSignals = Winos
+    mcTriggers = triggers_SOS_highMET[:] 
+elif region == "cr1l": 
+    mcSamples = [ DYJetsToLL_M50, WJetsToLNu_LO ] + Top
+    mcTriggers = triggers_1mu_iso + triggers_1e_iso + triggers_1e_noniso
+    mcSignals = []
+
 autoAAA(mcSamples)
-for c in mcSamples:
-    c.triggers = triggers_1mu_iso
+cropToLumi(mcSamples, 10*41.7)
+for c in mcSamples + mcSignals:
+    c.triggers = mcTriggers
 
 ## Data
 from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
-selectedComponents = mcSamples # + dataSamples
+if region == "sr":   
+    datasetsAndTriggers = [ ("MET", triggers_SOS_highMET) ]
+elif region == "cr1l":   
+    datasetsAndTriggers = [ ("SingleMuon", triggers_1mu_iso),
+                            ("SingleElectron", triggers_1e_iso + triggers_1e_noniso) ]
+json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
+dataSamples = []; vetoTriggers = []
+for (pdname, trigs) in datasetsAndTriggers:
+    for d in dataSamples_17Nov2017:
+        if pdname in d.name:
+            d.json = json
+            d.triggers = trigs[:]
+            d.vetoTriggers = vetoTriggers[:]
+            dataSamples.append(d)
+    vetoTriggers += trigs
+
+run = getHeppyOption("run","all")
+if run == "all":    selectedComponents = mcSamples + dataSamples + mcSignals
+elif run == "data": selectedComponents = dataSamples
+elif run == "mc":   selectedComponents = mcSamples
+elif run == "sig":  selectedComponents = mcSignals
+
 
 #-------- SEQUENCE -----------
-sequence = cfg.Sequence( [
-    lheWeightAna,
-    pileUpAna,
-    skimAnalyzer,
-    jsonAna,
-    triggerAna,
-
-    isoTrackFastSkim,
-    fastMETSkim,
-    fastJetSkim, 
-
-    genAna,
-    genHFAna,
-    #susyScanAna, # may be needed later
-
-    vertexAna,
-    lepAna,
-    tauAna,
-    photonAna,
-    jetAna,
-    jetAnaScaleUp,
-    jetAnaScaleDown,
-    metAna,
-    metAnaScaleUp,
-    metAnaScaleDown,
-    ttHJetMETSkim,
-
-    isoTrackDeDxAna,
-
-    triggerFlagsAna,
-    eventFlagsAna,
-
-    treeProducer,
-])
+sequence = cfg.Sequence( xtracks_sequence )
 
 #-------- HOW TO RUN -----------
 test = getHeppyOption('test')
@@ -140,18 +90,15 @@ if test == "1":
 elif test == "1S":
     comp = selectedComponents[0]
     comp.name = "Signal"
-    comp.files = [ '/afs/cern.ch/work/g/gpetrucc/SusyWithDeDx/CMSSW_9_4_6_patch1/src/MiniAODv2.root' ]
+    comp.files = [ '/eos/cms/store/cmst3/user/gpetrucc/SusyWithDeDx/Wino_M_500_cTau_10.merged/Wino_M_500_cTau_10.MiniAODv2_job1.root' ]
     selectedComponents = doTest1(comp, sequence=sequence, cache=False )
     print "The test wil use file %s " % comp.files[0]
-    ttHJetMETSkim.jetPtCuts = [ ]  # looser than the analysis, to allow for JEC uncertainties
-    ttHJetMETSkim.metCut    =   0.
     fastJetSkim.minJets = 0
-    fastMETSkim.metCut = 0
     isoTrackDeDxAna.doDeDx = True
     comp.triggers = []
 elif test in ('2','3','5s'):
     doTestN(test,selectedComponents)
 
 printSummary(selectedComponents)
-
-config = autoConfig(selectedComponents, sequence) #, xrd_aggressive=-1)
+if getHeppyOption("justSummary",False): sys.exit(0)
+config = autoConfig(selectedComponents, sequence)
