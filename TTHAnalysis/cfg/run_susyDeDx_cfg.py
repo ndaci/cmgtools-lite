@@ -12,7 +12,7 @@ from CMGTools.RootTools.samples.autoAAAconfig import *
 from CMGTools.TTHAnalysis.analyzers.xtracks_modules_cff import *
 
 ## Configuration that depends on the region
-region = getHeppyOption("region","sr") # use 'sr' or "cr1l"
+region = getHeppyOption("region","sr") # use 'sr', 'cr1l'
 
 fastJetSkim.minJets = 1 if region =="sr" else 0
 eventSkim.region = region
@@ -29,6 +29,7 @@ triggerFlagsAna.triggerBits = {
 ### MC
 from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import *
 Top = [ TTLep_pow, TTSemi_pow, T_tch, TBar_tch, T_tWch_noFullyHad, TBar_tWch_noFullyHad ]
+VV  = [ WW, WZ, ZZ]
 
 Wino_M_300_cTau_3  = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_3",  "Wino_M_300_cTau_3",  "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
 Wino_M_300_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_10", "Wino_M_300_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
@@ -40,11 +41,14 @@ if region == "sr":
     mcSamples = ([ W3JetsToLNu_LO, W1JetsToLNu_LO, W2JetsToLNu_LO, W4JetsToLNu_LO ]
                  + DYJetsToLLM50HT + DYJetsToLLM4to50HT
                  + ZvvLOHT 
-                 + Top )
+                 + Top 
+                 + VV )
     mcSignals = Winos
     mcTriggers = triggers_SOS_highMET[:] 
 elif region == "cr1l": 
-    mcSamples = [ DYJetsToLL_M50, WJetsToLNu_LO ] + Top
+    mcSamples = ([ DYJetsToLL_M50, WJetsToLNu_LO ] 
+                 + Top
+                 + VV )
     mcTriggers = triggers_1mu_iso + triggers_1e_iso + triggers_1e_noniso
     mcSignals = []
 
@@ -60,6 +64,7 @@ if region == "sr":
 elif region == "cr1l":   
     datasetsAndTriggers = [ ("SingleMuon", triggers_1mu_iso),
                             ("SingleElectron", triggers_1e_iso + triggers_1e_noniso) ]
+
 json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 dataSamples = []; vetoTriggers = []
 for (pdname, trigs) in datasetsAndTriggers:
@@ -76,6 +81,16 @@ if run == "all":    selectedComponents = mcSamples + dataSamples + mcSignals
 elif run == "data": selectedComponents = dataSamples
 elif run == "mc":   selectedComponents = mcSamples
 elif run == "sig":  selectedComponents = mcSignals
+
+if run == "sig": isoTrackDeDxAna.doDeDx = True
+
+if run == "data":
+    for c in  selectedComponents:
+       c.splitFactor = len(c.files)/3
+
+if run == "mc":
+    for c in  selectedComponents:
+       c.splitFactor = len(c.files)/2
 
 
 #-------- SEQUENCE -----------
