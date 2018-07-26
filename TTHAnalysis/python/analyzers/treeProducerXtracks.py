@@ -13,6 +13,7 @@ leptonTypeXtracks = NTupleObjectType("leptonXtracks", baseObjectTypes = [ lepton
     NTupleVariable("etaSc", lambda x : x.superCluster().eta() if abs(x.pdgId())==11 else -100, help="Electron supercluster pseudorapidity"),
     NTupleVariable("mcMatchPdgId",  lambda x : x.mcLep.pdgId() if getattr(x,'mcLep',None)!=None else -99, int, mcOnly=True, help="Match to source from hard scatter (pdgId of heaviest particle in chain, 25 for H, 6 for t, 23/24 for W/Z): pdgId of the matched gen-level lepton, zero if non-prompt or fake"),
     NTupleVariable("mcPromptGamma", lambda x : x.mcPho.isPromptFinalState() if getattr(x,"mcPho",None) else 0, int, mcOnly=True, help="Photon isPromptFinalState"),
+    NTupleVariable("triggerMatched", lambda x : 1 if x.matchedTrgObjSingleLep else 0, int, mcOnly=False, help="Is the lepton matched to a single lepton trigger"),
 ])
 leptonTypeXtracks.removeVariable("relIsoAn04")
 leptonTypeXtracks.removeVariable("eleCutIdSpring15_25ns_v1")
@@ -79,6 +80,14 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
 
     NTupleVariable("highPurity", lambda x : x.isHighPurityTrack(), int, help="High purity"),
 
+    NTupleVariable("miniIsoCH",   lambda x : x.miniPFIsolation().chargedHadronIso(), help="Charged hadron mini-isolation"),
+    NTupleVariable("miniIsoNH",   lambda x : x.miniPFIsolation().neutralHadronIso(), help="Neutral hadron mini-isolation"),
+    NTupleVariable("miniIsoPH",   lambda x : x.miniPFIsolation().photonIso(), help="Photon mini-isolation"),
+    NTupleVariable("miniIsoPU",   lambda x : x.miniPFIsolation().puChargedHadronIso(), help="Pileup charged hadron mini-isolation"),
+    NTupleVariable("dR03IsoCH",   lambda x : x.pfIsolationDR03().chargedHadronIso(), help="Charged hadron isolation dR=0.3"),
+    NTupleVariable("dR03IsoNH",   lambda x : x.pfIsolationDR03().neutralHadronIso(), help="Neutral hadron isolation dR=0.3"),
+    NTupleVariable("dR03IsoPH",   lambda x : x.pfIsolationDR03().photonIso(), help="Photon isolation = dR=0.3"),
+    NTupleVariable("dR03IsoPU",   lambda x : x.pfIsolationDR03().puChargedHadronIso(), help="Pileup charged hadron isolation dR=0.3"),
     NTupleVariable("caloEmEnergy",   lambda x : x.matchedCaloJetEmEnergy(), help="Energy in the ECAL behind the track"),
     NTupleVariable("caloHadEnergy",   lambda x : x.matchedCaloJetHadEnergy(), help="Energy in the HCAL behind the track"),
     NTupleVariable("channelsGoodECAL", lambda x : x.channelsGoodECAL, int, help="Flag set to 1 when the track extrapolates to all good ECAL channels"),
