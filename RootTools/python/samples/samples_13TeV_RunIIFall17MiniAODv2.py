@@ -68,12 +68,10 @@ DY = [
     DYJetsM50_HT2500toInf,
 ]
 
-DY = DYJets + DYNJetsToLL + DYJetsToLLM4to50HT + DYJetsToLLM50HT
-
 # Z(vv) + Jets
 ZvvJets_HT100to200      = kreator.makeMCComponent("ZvvJets_HT100to200"  ,    "/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 280.35  )
 ZvvJets_HT200to400      = kreator.makeMCComponent("ZvvJets_HT200to400"  ,    "/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 77.67   )
-ZvvJets_HT400to600      = kreator.makeMCComponent("ZvvJets_HT400to600"  ,    "/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 10.73   )
+#ZvvJets_HT400to600      = kreator.makeMCComponent("ZvvJets_HT400to600"  ,    "/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 10.73   )
 ZvvJets_HT600to800      = kreator.makeMCComponent("ZvvJets_HT600to800"  ,    "/ZJetsToNuNu_HT-600To800_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 2.559   )
 ZvvJets_HT800to1200     = kreator.makeMCComponent("ZvvJets_HT800to1200" ,    "/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM" ,  "CMS", ".*root", 1.1796  )
 ZvvJets_HT1200to2500    = kreator.makeMCComponent("ZvvJets_HT1200to2500",    "/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",  "CMS", ".*root", 0.28833 )
@@ -82,7 +80,7 @@ ZvvJets_HT2500toInf     = kreator.makeMCComponent("ZvvJets_HT2500toInf" ,    "/Z
 Zvv = [
     ZvvJets_HT100to200,
     ZvvJets_HT200to400,
-    ZvvJets_HT400to600,
+#    ZvvJets_HT400to600,
     ZvvJets_HT600to800,
     ZvvJets_HT800to1200,
     ZvvJets_HT1200to2500,
@@ -95,7 +93,7 @@ TTLep  = kreator.makeMCComponent("TTLep" , "/TTTo2L2Nu_TuneCP5_PSweights_13TeV-p
 TTHad  = kreator.makeMCComponent("TTHad" , "/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"    , "CMS", ".*root", 831.76*((1-3*0.108)**2)        )
 TTSemi = kreator.makeMCComponent("TTSemi", "/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 831.76*2*(3*0.108)*(1-3*0.108) )
 
-TT = [ TTJets, TTLep_pow, TTHad_pow, TTSemi_pow]
+TT = [ TTJets, TTLep, TTHad, TTSemi]
 
 # Single top
 T_tch     = kreator.makeMCComponent("T_tch"    , "/ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"    , "CMS", ".*root", 136.02)
@@ -106,14 +104,14 @@ TBar_tWch = kreator.makeMCComponent("TBar_tWch", "/ST_tW_antitop_5f_NoFullyHadro
 Ts = [
     T_tch, 
     TBar_tch,
-    T_tWch_noFullyHad, 
-    TBar_tWch_noFullyHad
+    T_tWch, 
+    TBar_tWch
 ]
 
 # Diboson
-WW         = kreator.makeMCComponent("WW"        , "/WW_TuneCP5_13TeV-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM"                                                        , "CMS", ".*root", 63.21 * 1.82)
-WZ         = kreator.makeMCComponent("WZ"        , "/WZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM"                                                        , "CMS", ".*root", 47.13)
-ZZ         = kreator.makeMCComponent("ZZ"        , "/ZZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM"                                                        , "CMS", ".*root", 16.523)
+WW         = kreator.makeMCComponent("WW"        , "/WW_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"                                     , "CMS", ".*root", 63.21 * 1.82)
+WZ         = kreator.makeMCComponent("WZ"        , "/WZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"                                     , "CMS", ".*root", 47.13)
+ZZ         = kreator.makeMCComponent("ZZ"        , "/ZZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"                                     , "CMS", ".*root", 16.523)
 
 WWTo2L2Nu  = kreator.makeMCComponent("WWTo2L2Nu" , "/WWTo2L2Nu_NNPDF31_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14_ext1-v1/MINIAODSIM", "CMS", ".*root", 10.481 )
 WWToLNuQQ  = kreator.makeMCComponent("WWToLNuQQ" , "/WWToLNuQQ_NNPDF31_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"               , "CMS", ".*root", 43.53  )
@@ -146,7 +144,7 @@ DiBosons = [
 # ----------------------------- summary ----------------------------------------
 
 
-mcSamples = QCD + Ws + DY + TTs + Ts + DiBosons
+mcSamples = QCD + Ws + DY + TT + Ts + DiBosons
 
 
 samples = mcSamples
