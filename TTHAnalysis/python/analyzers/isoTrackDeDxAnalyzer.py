@@ -163,6 +163,16 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             #            print " -> charge %+7d pt %7.1f eta %+6.2f phi %+6.2f   dr %.4f" % (t.charge(), t.pt(), t.eta(), t.phi(), deltaR(g,t))
             #print "\n"
 
+            ## Now we add a generic match to charginos + prompt leptons + prompt taus + prompt photons
+            anyMatchable = event.genCharginos[:]
+            anyMatchable += [ x for x in event.genParticles if abs(x.pdgId()) in (11,13) and (x.isPromptFinalState() or x.isDirectPromptTauDecayProductFinalState()) ]
+            anyMatchable += [ x for x in event.genParticles if abs(x.pdgId()) == 15 and x.isPromptDecayed() and x.pt() > 10 ]
+            anyMatchable += [ x for x in event.genParticles if x.pdgId() == 22 and x.isPromptFinalState() and x.pt() > 20 ]
+            matchAny = matchObjectCollection3(event.isoTracks, anyMatchable, deltaRMax = 0.2)
+            for t in event.isoTracks:
+                t.mcMatchAny = matchAny[t]
+
+
         # do any more event selection
         self.counters.counter('events').inc('accepted events')
         return True
