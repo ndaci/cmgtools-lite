@@ -180,7 +180,9 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("sizeYbyLayer12", lambda x : x.sizeYbyLayer[12], int),
     NTupleVariable("sizeYbyLayer13", lambda x : x.sizeYbyLayer[13], int),
                                                                                                          
-    NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True)
+    NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True),
+    NTupleVariable("mcMatchAnyId", lambda x : x.mcMatchAny.pdgId()*(1+99*x.mcMatchAny.isDirectPromptTauDecayProductFinalState()) if x.mcMatchAny else 0, int, mcOnly=True, help="MC pdgId of the matched gen lepton, tau, photon or chargino (for leptons from tau, it's pdgId*100)"),
+    NTupleVariable("mcMatchAnyPt", lambda x : x.mcMatchAny.pt() if x.mcMatchAny else 0, int, mcOnly=True, help="MC pt of the matched gen lepton, tau, photon or chargino"),
 ]
 )
 
