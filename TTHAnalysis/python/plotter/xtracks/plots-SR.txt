@@ -1,0 +1,21 @@
+# vim: syntax=sh
+
+yield: 0.5 : 1,0,1; XTitle="Events", MoreY=2
+
+met:  met_pt: 20,200,1200 ; XTitle="E_{T}^{miss}  [GeV]", Logy
+nJets25 : nJet : [0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5] ; XTitle='N(jet\, p_{T} > 25\, |#eta| < 2.4)', Logy, MoreY=3
+nJets30 : Sum$(Jet_pt > 30) : [0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5] ; XTitle='N(jet\, p_{T} > 30\, |#eta| < 2.4)', Logy, MoreY=3
+nBJets30 : Sum$(Jet_btagDeepCSV > 0.4941 && Jet_pt > 30) : [-0.5,0.5,1.5,2.5,3.5] ; XTitle='N(bjet\, p_{T} > 30\, DCSV-M)', Logy
+
+Jet1_pt : Jet_pt[0] : 20,100,1200 ; XTitle="Lead jet p_{T} (GeV)", Logy
+Jet1_eta : Jet_eta[0] : 20,-2.4,2.4 ; XTitle="Lead jet #eta"
+Jet1_CHEF : Jet_chHEF[0] : 10,0,1 ; XTitle="Lead jet CHEF", MoreY=2
+Jet1_NHEF : Jet_neHEF[0] : 10,0,1 ; XTitle="Lead jet NHEF", MoreY=2
+
+nTauGood  : nTauGood  : [-0.5,0.5,1.5,2.5]  ; XTitle='N(#tau\, loose)', XNDiv=505, Logy
+nLepGood  : nLepGood  : [-0.5,0.5,1.5,2.5]  ; XTitle='N(l\, loose)', XNDiv=505, Logy
+
+IsoTrack_pt : IsoTrack_pt : 20,0,500 ; XTitle="track p_{T} (GeV)"
+IsoTrack_eta : IsoTrack_eta : 20,-2.4,2.4 ; XTitle="track #eta  (GeV)"
+
+IsoTrack_relIso03 : (IsoTrack_dR03IsoCH + max(0, IsoTrack_dR03IsoNH+IsoTrack_dR03IsoPH-0.5*IsoTrack_dR03IsoPU))/IsoTrack_pt : 20,0,0.5 ; XTitle="track relIso(R 0.3)"
