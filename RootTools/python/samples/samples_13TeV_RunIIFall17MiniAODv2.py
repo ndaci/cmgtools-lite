@@ -144,7 +144,7 @@ DiBosons = [
 # ----------------------------- summary ----------------------------------------
 
 
-mcSamples = QCD + Ws + DY + TT + Ts + DiBosons
+mcSamples = QCD + Ws + DY + Zvv + TT + Ts + DiBosons
 
 
 samples = mcSamples
