@@ -147,6 +147,9 @@ lheWeightAna = cfg.Analyzer(
     useLumiInfo=False
 )
 
+from PhysicsTools.Heppy.analyzers.gen.LHEAnalyzer import LHEAnalyzer 
+lheAna = LHEAnalyzer.defaultConfig
+
 # Lepton Analyzer (generic)
 lepAna = cfg.Analyzer(
     LeptonAnalyzer, name="leptonAnalyzer",
@@ -407,6 +410,7 @@ xtracks_sequence = [
 
     genAna,
     genHFAna,
+    lheAna,
 
     vertexAna,
     lepAna,

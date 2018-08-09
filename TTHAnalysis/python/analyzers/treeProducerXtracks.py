@@ -209,6 +209,7 @@ treeProducer = cfg.Analyzer(
         ## ------- lheHT, needed for merging HT binned samples
         NTupleVariable("lheHT", lambda ev : getattr(ev,"lheHT",-999), mcOnly=True, help="H_{T} computed from quarks and gluons in Heppy LHEAnalyzer"),
         NTupleVariable("lheHTIncoming", lambda ev : getattr(ev,"lheHTIncoming",-999), mcOnly=True, help="H_{T} computed from quarks and gluons in Heppy LHEAnalyzer (only LHE status<0 as mothers)"),
+        NTupleVariable("lheVpt", lambda ev : getattr(ev,"lheV_pt",-999), mcOnly=True, help="p_{T} of the V boson at LHE level"),
         ],
     globalObjects = {
         "met"             : NTupleObject("met", metTypeXtracks, help="PF E_{T}^{miss}"),
