@@ -116,6 +116,12 @@ sequence = cfg.Sequence( xtracks_sequence )
 #-------- HOW TO RUN -----------
 test = getHeppyOption('test')
 if test == "1":
+    if getHeppyOption("sample"):
+        selected = [ s for s in selectedComponents if getHeppyOption("sample") == s.name ]
+        if not selected:
+            print "Sample %s not found. Known samples are: %s" % [ getHeppyOption("sample"), ", ".join(sorted(s.name for s in selectedComponents)) ]
+            sys.exit(1)
+        selectedComponents = selected
     print "The test wil use %s " % selectedComponents[0].name
     selectedComponents = doTest1(selectedComponents[0], sequence=sequence, cache=True )
     print "The test wil use file %s " % selectedComponents[0].files[0]
