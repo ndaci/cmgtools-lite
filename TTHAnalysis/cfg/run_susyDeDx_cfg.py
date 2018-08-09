@@ -34,7 +34,10 @@ Wino_M_300_cTau_3  = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_3",  "Wino_
 Wino_M_300_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_10", "Wino_M_300_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
 Wino_M_300_cTau_30 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_30", "Wino_M_300_cTau_30", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
 Wino_M_500_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_500_cTau_10", "Wino_M_500_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
-Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_500_cTau_10 ]
+Wino_M_650_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_650_cTau_10", "Wino_M_650_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_800_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_800_cTau_10", "Wino_M_800_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_1000_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_1000_cTau_10", "Wino_M_1000_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_500_cTau_10, Wino_M_650_cTau_10, Wino_M_800_cTau_10, Wino_M_1000_cTau_10 ]
 
 Top = [ TTLep, TTHad, TTSemi] + Ts
 VV  = [ WW, WZ, ZZ ]
