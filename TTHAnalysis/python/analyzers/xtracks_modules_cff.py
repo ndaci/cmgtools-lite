@@ -387,7 +387,7 @@ eventSkim = cfg.Analyzer( xtracksFilters, name='xtracksSkim',
 ## Full DeDx analyzer
 from CMGTools.TTHAnalysis.analyzers.isoTrackDeDxAnalyzer import isoTrackDeDxAnalyzer
 isoTrackDeDxAna = cfg.Analyzer(isoTrackDeDxAnalyzer, name="isoTrackDeDxAna",
-    doDeDx = "94XMiniAODv1-Hack", 
+    doDeDx = True, 
         # for 94X MiniAOD v2, just set it to True
         # for 94X MiniAOD v1, you have two options
         #  - set it to False, and have no DeDx

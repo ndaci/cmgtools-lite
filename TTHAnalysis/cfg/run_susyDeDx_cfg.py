@@ -85,7 +85,7 @@ elif region == "cr1l":
 json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 dataSamples = []; vetoTriggers = []
 for (pdname, trigs) in datasetsAndTriggers:
-    for d in dataSamples_17Nov2017:
+    for d in dataSamples_31Mar2018:
         if pdname in d.name:
             d.json = json
             d.triggers = trigs[:]
