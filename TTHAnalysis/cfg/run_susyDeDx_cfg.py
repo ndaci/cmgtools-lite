@@ -85,7 +85,7 @@ elif region == "cr1l":
 json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 dataSamples = []; vetoTriggers = []
 for (pdname, trigs) in datasetsAndTriggers:
-    for d in dataSamples_17Nov2017:
+    for d in dataSamples_31Mar2018:
         if pdname in d.name:
             d.json = json
             d.triggers = trigs[:]
@@ -116,6 +116,12 @@ sequence = cfg.Sequence( xtracks_sequence )
 #-------- HOW TO RUN -----------
 test = getHeppyOption('test')
 if test == "1":
+    if getHeppyOption("sample"):
+        selected = [ s for s in selectedComponents if getHeppyOption("sample") == s.name ]
+        if not selected:
+            print "Sample %s not found. Known samples are: %s" % [ getHeppyOption("sample"), ", ".join(sorted(s.name for s in selectedComponents)) ]
+            sys.exit(1)
+        selectedComponents = selected
     print "The test wil use %s " % selectedComponents[0].name
     selectedComponents = doTest1(selectedComponents[0], sequence=sequence, cache=True )
     print "The test wil use file %s " % selectedComponents[0].files[0]
