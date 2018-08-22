@@ -10,8 +10,8 @@ void plot() {
     double xmax  =  200.;
 
     std::string plotvar = "mt";
-    std::string xlabel  = "E_{T}^{miss} [GeV]";
-    std::string ylabel  = "Events / 50 GeV";
+    std::string xlabel  = "Transverse mass";
+    std::string ylabel  = "Events / 10 GeV";
 
     std::vector<std::string> cuts;
     cuts.push_back("hltmet > 0");
