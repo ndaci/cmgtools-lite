@@ -6,12 +6,14 @@ void plot() {
     int region   =    1 ;
 
     int    nbins =   20 ;
-    double xmin  =    0.;
-    double xmax  =  200.;
+    double xmin  =  200.;
+    double xmax  = 1200.;
 
-    std::string plotvar = "mt";
-    std::string xlabel  = "Transverse mass";
-    std::string ylabel  = "Events / 10 GeV";
+    std::string plotvar = "met";
+    std::string xlabel  = "E_{T}^{miss} [GeV]";
+    std::string ylabel  = "Events / 50 GeV";
+
+    bool isLogY  = true;
 
     std::vector<std::string> cuts;
     cuts.push_back("hltmet > 0");
@@ -25,14 +27,14 @@ void plot() {
     if (region == 1) {
     cuts.push_back("nmuons == 1");
     cuts.push_back("abs(m1id) == 3 && m1pt > 20");
-    //cuts.push_back("rmet > 50 && mt < 160");
-    cuts.push_back("rmet > 50");
+    cuts.push_back("rmet > 50 && mt < 160");
     }
     if (region == 2) {
     cuts.push_back("nmuons == 2");
     cuts.push_back("(m1id * m2id == -3 || m1id * m2id == -9) && ((abs(m1id) == 3 && m1pt > 20.) || (abs(m2id) == 3 && m2pt > 20.))");
     cuts.push_back("mass > 60 && mass < 120");
     }
+    cuts.push_back("nxtrks > 0");
 
     TH1F* dat = new TH1F("dat", "dat", nbins, xmin, xmax);
     TH1F* zll = new TH1F("zll", "zll", nbins, xmin, xmax);
@@ -120,11 +122,13 @@ void plot() {
     double ymax = stk->GetMaximum();
 
     if (ymin > dat->GetMinimum()) ymin = dat->GetMinimum();
-    if (ymax < dat->GetMaximum()) ymax = dat->GetMinimum();
+    if (ymax < dat->GetMaximum()) ymax = dat->GetMaximum();
 
     ymax *= 1.2;
     ymin *= 0.5;
     if (ymin == 0. && ymax > 1.) ymin = 0.0001;
+
+    std::cout << ymin << " " << ymax << std::endl;
 
     TH1* frame = gPad->DrawFrame(xmin, ymin, xmax, ymax, "");
     frame->GetXaxis()->SetTitle(xlabel.c_str());
@@ -155,5 +159,6 @@ void plot() {
 
     leg->Draw("SAME");
 
+    if (isLogY) gPad->SetLogy();
     gPad->RedrawAxis();
 }
