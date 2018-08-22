@@ -63,7 +63,7 @@ eventFlagsAna = cfg.Analyzer(
         "eeBadScFilter" : [ "Flag_eeBadScFilter" ],
         "ecalBadCalibFilter" : [ "Flag_ecalBadCalibFilter" ],
         "BadPFMuonFilter" : [ "Flag_BadPFMuonFilter" ],
-        "BadChargedCandidateFilter" : [ "BadChargedCandidateFilter" ],
+        "BadChargedCandidateFilter" : [ "Flag_BadChargedCandidateFilter" ],
         }
     )
 
