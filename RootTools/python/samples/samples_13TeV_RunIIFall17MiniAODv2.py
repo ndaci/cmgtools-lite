@@ -71,7 +71,7 @@ DY = [
 # Z(vv) + Jets
 ZvvJets_HT100to200      = kreator.makeMCComponent("ZvvJets_HT100to200"  ,    "/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 280.35  )
 ZvvJets_HT200to400      = kreator.makeMCComponent("ZvvJets_HT200to400"  ,    "/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 77.67   )
-#ZvvJets_HT400to600      = kreator.makeMCComponent("ZvvJets_HT400to600"  ,    "/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 10.73   )
+ZvvJets_HT400to600      = kreator.makeMCComponent("ZvvJets_HT400to600"  ,    "/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 10.73   )
 ZvvJets_HT600to800      = kreator.makeMCComponent("ZvvJets_HT600to800"  ,    "/ZJetsToNuNu_HT-600To800_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"  ,  "CMS", ".*root", 2.559   )
 ZvvJets_HT800to1200     = kreator.makeMCComponent("ZvvJets_HT800to1200" ,    "/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM" ,  "CMS", ".*root", 1.1796  )
 ZvvJets_HT1200to2500    = kreator.makeMCComponent("ZvvJets_HT1200to2500",    "/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM",  "CMS", ".*root", 0.28833 )
@@ -80,7 +80,7 @@ ZvvJets_HT2500toInf     = kreator.makeMCComponent("ZvvJets_HT2500toInf" ,    "/Z
 Zvv = [
     ZvvJets_HT100to200,
     ZvvJets_HT200to400,
-#    ZvvJets_HT400to600,
+    ZvvJets_HT400to600,
     ZvvJets_HT600to800,
     ZvvJets_HT800to1200,
     ZvvJets_HT1200to2500,
