@@ -28,7 +28,6 @@ triggerFlagsAna.triggerBits = {
 
 ### MC
 from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAODv2 import *
-#from CMGTools.RootTools.samples.samples_13TeV_RunIIFall17MiniAOD import *
 
 Wino_M_300_cTau_3  = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_3",  "Wino_M_300_cTau_3",  "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
 Wino_M_300_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_300_cTau_10", "Wino_M_300_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
@@ -41,7 +40,6 @@ Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_
 
 Top = [ TTLep, TTHad, TTSemi] + Ts
 VV  = [ WW, WZ, ZZ ]
-#ZvvHT400 = [ ZvvJets_HT400to600 ]
 
 Zll = [
     DYJetsM50_HT100to200,     DYJetsM50_HT100to200e,
