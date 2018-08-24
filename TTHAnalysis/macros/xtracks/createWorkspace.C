@@ -81,7 +81,7 @@ void makeConnectedBinList(string procname, RooRealVar& var, RooWorkspace& ws, TH
     ws.import(norm, RooFit::RecycleConflictNodes());
 }
 
-void createWorkspace(std::map<std::string, TH1*>) {
+void createWorkspace(std::map<std::string, TH1*> templates) {
     gSystem->Load("libHiggsAnalysisCombinedLimit.so");
     
     TFile *outfile = new TFile("workspace.root","RECREATE");
