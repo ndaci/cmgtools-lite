@@ -63,9 +63,11 @@ if region == "sr":
     mcSignals = Winos
     mcTriggers = triggers_SOS_highMET[:] 
 elif region == "cr1l": 
-    mcSamples = ([ DYJetsToLL_M50, WJetsToLNu_LO ] 
-                 + Top
-                 + VV )
+    mcSamples =  ( QCD
+                 + Ws
+                 + Zll 
+                 + VV
+                 + Top)
     mcTriggers = triggers_1mu_iso + triggers_1e_iso + triggers_1e_noniso
     mcSignals = []
 
