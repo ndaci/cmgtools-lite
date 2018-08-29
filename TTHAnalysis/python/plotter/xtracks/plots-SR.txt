@@ -23,3 +23,6 @@ IsoTrack_relIso03 : (IsoTrack_dR03IsoCH + max(0, IsoTrack_dR03IsoNH+IsoTrack_dR0
 ## For Zmm
 zmm_metNoMu:  metNoMu_pt: 20,200,1200 ; XTitle="E_{T}^{miss} (no #mu) [GeV]", Logy
 zmm_mass : mass_2(LepGood_pt[0],LepGood_eta[0],LepGood_phi[0],LepGood_mass[0],LepGood_pt[1],LepGood_eta[1],LepGood_phi[1],LepGood_mass[1]) : 40,60,120 ; XTitle="m(#mu#mu) [GeV]"
+
+## DeDx NN (4 hits)
+IsoTrack_dedxNN4h : IsoTrack_dedxNN4h : 10,0,1 ; XTitle="dE/dx NN (4-hit version)"

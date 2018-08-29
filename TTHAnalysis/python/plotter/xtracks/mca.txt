@@ -1,7 +1,8 @@
 # vim: syntax=sh
 * ; TreeName="treeProducerXtracks"
 
-#wino_m300_ct10+ : Wino_M_300_cTau_10 : xsec : 1 ;  FillColor=ROOT.kYellow; Label="\#chi^{\#pm} (300\, c\#tau 10)"
+# we only take MC-matched tracks in the signal
+wino_m1000_ct10+ : Wino_M_1000_cTau_10 : xsec : IsoTrack_mcMatch != -1 ;  FillColor=ROOT.kViolet+1, Label="\#chi^{\#pm} (1T\, c\#tau 10)"
 
 zvv : ZvvJets_HT100to200 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
 zvv : ZvvJets_HT200to400 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
