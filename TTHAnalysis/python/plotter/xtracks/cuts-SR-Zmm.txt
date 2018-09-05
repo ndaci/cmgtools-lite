@@ -1,0 +1,31 @@
+# vim: syntax=sh
+HLT : HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+
+LepVeto: nLepGood == 2
+
+TauVeto: nTauGood == 0
+
+MET200 : metNoMu_pt > 200
+
+Jet100 : Jet_pt[0] > 100    # these are central jets and are already pT sorted
+FwdLeadingJetVeto : Alt$(JetFwd_pt[0],0) < Jet_pt[0] # veto cases where the leading Fwd jet is harder than the central jet
+JetID : Jet_chHEF[0] > 0.1 && Jet_neHEF[0] < 0.8
+BTagVeto : Sum$(Jet_btagDeepCSV > 0.4941 && Jet_pt > 30) == 0
+JetMETPhiVeto: Sum$(deltaPhi(Jet_phi,metNoMu_phi) < 0.5 && Jet_pt > 30) == 0
+
+
+MuMu: LepGood_pdgId[0]*LepGood_pdgId[1] == -169 
+ZPeak: abs(mass_2(LepGood_pt[0],LepGood_eta[0],LepGood_phi[0],LepGood_mass[0],LepGood_pt[1],LepGood_eta[1],LepGood_phi[1],LepGood_mass[1])-90) < 30
+
+DrLepTrack: deltaR(LepGood_eta[0],LepGood_phi[0],IsoTrack_eta,IsoTrack_phi) > 0.4 && deltaR(LepGood_eta[1],LepGood_phi[1],IsoTrack_eta,IsoTrack_phi) > 0.4
+DrLepLeadJet: deltaR(LepGood_eta[0],LepGood_phi[0],Jet_eta[0],Jet_phi[0]) > 0.4 
+
+MuonID: (LepGood_pt[0] > 20 && LepGood_tightId[0] && LepGood_relIso04[0] < 0.15) || (LepGood_pt[1] > 20 && LepGood_tightId[1] && LepGood_relIso04[1] < 0.15)
+
+Track: IsoTrack_pt > 50 && abs(IsoTrack_eta) < 2.4 && IsoTrack_highPurity
+PFIso: IsoTrack_dR03IsoCH + max(0, IsoTrack_dR03IsoNH+IsoTrack_dR03IsoPH-0.5*IsoTrack_dR03IsoPU) < 0.15 * IsoTrack_pt
+3Pix : IsoTrack_pixelLayers >= 3
+NoLost : IsoTrack_missingInnerTrackerHits == 0 && IsoTrack_missingMiddleTrackerHits == 0
+
+NoStrips : IsoTrack_pixelHits == IsoTrack_trackerHits; Disable=True
+
