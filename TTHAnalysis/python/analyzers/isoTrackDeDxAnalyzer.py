@@ -2,6 +2,7 @@ from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 from PhysicsTools.Heppy.physicsobjects.Electron import Electron
 
+import ROOT
 
 from PhysicsTools.HeppyCore.utils.deltar import deltaR, matchObjectCollection3
 
@@ -78,11 +79,31 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             sizeXarray = []
             sizeYarray = []
             
+            # geometry for pixels
+            layerPixelArray  = []
+            ladderPixelArray = []
+            modulePixelArray = []
+            sidePixelArray   = []
+            diskPixelArray   = []
+            bladePixelArray  = []
+            panelPixelArray  = []
+
+            
             for i in xrange(100):
               dedxArray.append(0)
               subDetIdArray.append(0)
               sizeXarray.append(0)
               sizeYarray.append(0)
+
+              # geometry for pixels              
+              layerPixelArray  .append(0)
+              ladderPixelArray .append(0)
+              modulePixelArray .append(0)
+              sidePixelArray   .append(0)
+              diskPixelArray   .append(0)
+              bladePixelArray  .append(0)
+              panelPixelArray  .append(0)
+              
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -108,12 +129,47 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                       sizeYarray[ih] = pixelCluster.sizeY()
                       
                       mysum += pixelCluster.charge()
+
+                      #
+                      #  https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/DeDxHitInfo.h
+                      #
+                      #  dEdX object DeDxHitInfoCollection
+                      #
+                      #
+                      #  https://github.com/cms-sw/cmssw/blob/master/DataFormats/SiPixelDetId/interface/PXBDetId.h
+                      #  https://github.com/cms-sw/cmssw/blob/master/DataFormats/SiPixelDetId/interface/PXFDetId.h
+                      #
+                      if dedx.detId(ih).subdetId() == 1 :
+                        # barrel
+                        layerPixelArray  [ih] = ROOT.PXBDetId( dedx.detId(ih).rawId() ).layer()
+                        ladderPixelArray [ih] = ROOT.PXBDetId( dedx.detId(ih).rawId() ).ladder()
+                        modulePixelArray [ih] = ROOT.PXBDetId( dedx.detId(ih).rawId() ).module()
+                        sidePixelArray   [ih] = -99
+                        diskPixelArray   [ih] = -99
+                        bladePixelArray  [ih] = -99
+                        panelPixelArray  [ih] = -99
+
+                        #print " Barrel[", dedx.detId(ih).subdetId(), "]:: ", ROOT.PXBDetId( dedx.detId(ih).rawId() ).layer(), "   ",  ROOT.PXBDetId( dedx.detId(ih).rawId() ).ladder(), "   ",  ROOT.PXBDetId( dedx.detId(ih).rawId() ).module()                        
+                      else :
+                        # endcap
+                        layerPixelArray  [ih] = -99
+                        ladderPixelArray [ih] = -99
+                        modulePixelArray [ih] = ROOT.PXFDetId( dedx.detId(ih).rawId() ).module()
+                        sidePixelArray   [ih] = ROOT.PXFDetId( dedx.detId(ih).rawId() ).side()
+                        diskPixelArray   [ih] = ROOT.PXFDetId( dedx.detId(ih).rawId() ).disk()
+                        bladePixelArray  [ih] = ROOT.PXFDetId( dedx.detId(ih).rawId() ).blade()
+                        panelPixelArray  [ih] = ROOT.PXFDetId( dedx.detId(ih).rawId() ).panel()
+
+                        #print " Endcap[", dedx.detId(ih).subdetId(), "]:: ", ROOT.PXFDetId( dedx.detId(ih).rawId() ).side(), "   ",  ROOT.PXFDetId( dedx.detId(ih).rawId() ).disk(), "   ",  ROOT.PXFDetId( dedx.detId(ih).rawId() ).blade(), "   ",  ROOT.PXFDetId( dedx.detId(ih).rawId() ).panel(), "   ",  ROOT.PXFDetId( dedx.detId(ih).rawId() ).module()
+                        
+                        
                     if stripCluster:
                       dedxArray[ih] = stripCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
                       dedxArray[ih] *= stripChargeToEnergyCoefficient
                     subDetIdArray[ih] = dedx.detId(ih).subdetId()
 
+                    
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
@@ -123,6 +179,14 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.subDetIdByLayer = subDetIdArray
             t.sizeXbyLayer = sizeXarray
             t.sizeYbyLayer = sizeYarray
+
+            t.layerPixelByLayer   = layerPixelArray  
+            t.ladderPixelByLayer  = ladderPixelArray 
+            t.modulePixelByLayer  = modulePixelArray 
+            t.sidePixelByLayer    = sidePixelArray   
+            t.diskPixelByLayer    = diskPixelArray   
+            t.bladePixelByLayer   = bladePixelArray  
+            t.panelPixelByLayer   = panelPixelArray  
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
