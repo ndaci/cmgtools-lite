@@ -62,13 +62,7 @@ metTypeXtracksBasic = NTupleObjectType("metXtracksBasic", baseObjectTypes = [ fo
 def _isoDBeta(x):
     return x.chargedHadronIso() + max(x.neutralHadronIso()+x.photonIso()-0.5*x.puChargedHadronIso(), 0)
 
-isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ particleType ], variables = [
-    NTupleVariable("charge",   lambda x : x.charge(), int),
-    NTupleVariable("dxy",   lambda x : x.dxy(), help="d_{xy} with respect to PV, in cm (with sign)"),
-    NTupleVariable("dz",    lambda x : x.dz() , help="d_{z} with respect to PV, in cm (with sign)"),
-    NTupleVariable("edxy",  lambda x : x.dxyError(), help="#sigma(d_{xy}) with respect to PV, in cm"),
-    NTupleVariable("edz", lambda x : x.dzError(), help="#sigma(d_{z}) with respect to PV, in cm"),    
-
+hitPatternType = NTupleObjectType("hitPatternType", baseObjectTypes = [], variables = [
     NTupleVariable("trackerLayers", lambda x : x.hitPattern().trackerLayersWithMeasurement(), int, help="Tracker Layers"),
     NTupleVariable("pixelLayers", lambda x : x.hitPattern().pixelLayersWithMeasurement(), int, help="Pixel Layers"),
     NTupleVariable("trackerHits", lambda x : x.hitPattern().numberOfValidTrackerHits(), int, help="Tracker hits"),
@@ -80,46 +74,8 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("missingInnerTrackerHits", lambda x : x.hitPattern().numberOfLostTrackerHits(1), int, help="Missing inner tracker hits"),
     NTupleVariable("missingOuterTrackerHits", lambda x : x.hitPattern().numberOfLostTrackerHits(2), int, help="Missing outer tracker hits"),
     NTupleVariable("missingMiddleTrackerHits", lambda x : x.hitPattern().numberOfLostTrackerHits(0), int, help="Missing tracker hits in the middle of the track"),
-
-    NTupleVariable("highPurity", lambda x : x.isHighPurityTrack(), int, help="High purity"),
-
-    NTupleVariable("miniIsoCH",   lambda x : x.miniPFIsolation().chargedHadronIso(), help="Charged hadron mini-isolation"),
-    NTupleVariable("miniIsoNH",   lambda x : x.miniPFIsolation().neutralHadronIso(), help="Neutral hadron mini-isolation"),
-    NTupleVariable("miniIsoPH",   lambda x : x.miniPFIsolation().photonIso(), help="Photon mini-isolation"),
-    NTupleVariable("miniIsoPU",   lambda x : x.miniPFIsolation().puChargedHadronIso(), help="Pileup charged hadron mini-isolation"),
-    NTupleVariable("miniRelIso",   lambda x : _isoDBeta(x.miniPFIsolation())/x.pt(), help="mini-isolation (relative, PU-corrected using dBeta)"),
-    NTupleVariable("dR03IsoCH",   lambda x : x.pfIsolationDR03().chargedHadronIso(), help="Charged hadron isolation dR=0.3"),
-    NTupleVariable("dR03IsoNH",   lambda x : x.pfIsolationDR03().neutralHadronIso(), help="Neutral hadron isolation dR=0.3"),
-    NTupleVariable("dR03IsoPH",   lambda x : x.pfIsolationDR03().photonIso(), help="Photon isolation = dR=0.3"),
-    NTupleVariable("dR03IsoPU",   lambda x : x.pfIsolationDR03().puChargedHadronIso(), help="Pileup charged hadron isolation dR=0.3"),
-    NTupleVariable("relIso03",   lambda x : _isoDBeta(x.pfIsolationDR03())/x.pt(), help="relative isolation dR=0.3 (PU-corrected using dBeta)"),
-    NTupleVariable("caloEmEnergy",   lambda x : x.matchedCaloJetEmEnergy(), help="Energy in the ECAL behind the track"),
-    NTupleVariable("caloHadEnergy",   lambda x : x.matchedCaloJetHadEnergy(), help="Energy in the HCAL behind the track"),
-    NTupleVariable("channelsGoodECAL", lambda x : x.channelsGoodECAL, int, help="Flag set to 1 when the track extrapolates to all good ECAL channels"),
-    NTupleVariable("channelsGoodHCAL", lambda x : x.channelsGoodHCAL, int, help="Flag set to 1 when the track extrapolates to all good HCAL channels"),
-
-    NTupleVariable("awayJet_idx", lambda x : x.leadAwayJet.index if x.leadAwayJet else -1, int),
-    NTupleVariable("awayJet_pt", lambda x : x.leadAwayJet.pt() if x.leadAwayJet else 0),
-    NTupleVariable("awayJet_dr", lambda x : deltaR(x, x.leadAwayJet) if x.leadAwayJet else 0),
-
-    NTupleVariable("awayNJet", lambda x : x.awayJetInfo['num'], int),
-    NTupleVariable("awayHTJet", lambda x : x.awayJetInfo['ht']),
-
-    NTupleVariable("awayMu_idx", lambda x : x.leadAwayMu.index if x.leadAwayMu else -1, int),
-    NTupleVariable("awayMu_dr", lambda x : deltaR(x, x.leadAwayMu) if x.leadAwayMu else 0),
-    NTupleVariable("awayMu_mll", lambda x : (x.leadAwayMu.p4()+x.p4()).M() if x.leadAwayMu else 0),
-
-    NTupleVariable("awayEle_idx", lambda x : x.leadAwayEle.index if x.leadAwayEle else -1, int),
-    NTupleVariable("awayEle_dr", lambda x : deltaR(x, x.leadAwayEle) if x.leadAwayEle else 0),
-    NTupleVariable("awayEle_mll", lambda x : (x.leadAwayEle.p4()+x.p4()).M() if x.leadAwayEle else 0),
-
-    NTupleVariable("closestMu_idx", lambda x : x.closestMu.index if x.closestMu else -1, int),
-    NTupleVariable("closestEle_idx", lambda x : x.closestEle.index if x.closestEle else -1, int),
-    NTupleVariable("closestTau_idx", lambda x : x.closestTau.index if x.closestTau else -1, int),
-
-    NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
-
-    NTupleVariable("myDeDx", lambda x : x.myDeDx),
+])
+hitDeDxType = NTupleObjectType("hitDeDxType", baseObjectTypes = [], variables = [
     NTupleVariable("dedxByLayer0", lambda x : x.dedxByLayer[0]),
     NTupleVariable("dedxByLayer1", lambda x : x.dedxByLayer[1]),
     NTupleVariable("dedxByLayer2", lambda x : x.dedxByLayer[2]),
@@ -179,12 +135,124 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("sizeYbyLayer11", lambda x : x.sizeYbyLayer[11], int),
     NTupleVariable("sizeYbyLayer12", lambda x : x.sizeYbyLayer[12], int),
     NTupleVariable("sizeYbyLayer13", lambda x : x.sizeYbyLayer[13], int),
+    
+    NTupleVariable("layerByLayer0", lambda x : x.layerByLayer[0], int),
+    NTupleVariable("layerByLayer1", lambda x : x.layerByLayer[1], int),
+    NTupleVariable("layerByLayer2", lambda x : x.layerByLayer[2], int),
+    NTupleVariable("layerByLayer3", lambda x : x.layerByLayer[3], int),
+    NTupleVariable("layerByLayer4", lambda x : x.layerByLayer[4], int),
+    NTupleVariable("layerByLayer5", lambda x : x.layerByLayer[5], int),
+    NTupleVariable("layerByLayer6", lambda x : x.layerByLayer[6], int),
+    NTupleVariable("layerByLayer7", lambda x : x.layerByLayer[7], int),
+    NTupleVariable("layerByLayer8", lambda x : x.layerByLayer[8], int),
+    NTupleVariable("layerByLayer9", lambda x : x.layerByLayer[9], int),
+    NTupleVariable("layerByLayer10", lambda x : x.layerByLayer[10], int),
+    NTupleVariable("layerByLayer11", lambda x : x.layerByLayer[11], int),
+    NTupleVariable("layerByLayer12", lambda x : x.layerByLayer[12], int),
+    NTupleVariable("layerByLayer13", lambda x : x.layerByLayer[13], int),
+
+    NTupleVariable("ladderOrBladeByLayer0", lambda x : x.ladderOrBladeByLayer[0], int),
+    NTupleVariable("ladderOrBladeByLayer1", lambda x : x.ladderOrBladeByLayer[1], int),
+    NTupleVariable("ladderOrBladeByLayer2", lambda x : x.ladderOrBladeByLayer[2], int),
+    NTupleVariable("ladderOrBladeByLayer3", lambda x : x.ladderOrBladeByLayer[3], int),
+    NTupleVariable("ladderOrBladeByLayer4", lambda x : x.ladderOrBladeByLayer[4], int),
+    NTupleVariable("ladderOrBladeByLayer5", lambda x : x.ladderOrBladeByLayer[5], int),
+    NTupleVariable("ladderOrBladeByLayer6", lambda x : x.ladderOrBladeByLayer[6], int),
+    NTupleVariable("ladderOrBladeByLayer7", lambda x : x.ladderOrBladeByLayer[7], int),
+    NTupleVariable("ladderOrBladeByLayer8", lambda x : x.ladderOrBladeByLayer[8], int),
+    NTupleVariable("ladderOrBladeByLayer9", lambda x : x.ladderOrBladeByLayer[9], int),
+    NTupleVariable("ladderOrBladeByLayer10", lambda x : x.ladderOrBladeByLayer[10], int),
+    NTupleVariable("ladderOrBladeByLayer11", lambda x : x.ladderOrBladeByLayer[11], int),
+    NTupleVariable("ladderOrBladeByLayer12", lambda x : x.ladderOrBladeByLayer[12], int),
+    NTupleVariable("ladderOrBladeByLayer13", lambda x : x.ladderOrBladeByLayer[13], int),
+
+    NTupleVariable("moduleByLayer0", lambda x : x.moduleByLayer[0], int),
+    NTupleVariable("moduleByLayer1", lambda x : x.moduleByLayer[1], int),
+    NTupleVariable("moduleByLayer2", lambda x : x.moduleByLayer[2], int),
+    NTupleVariable("moduleByLayer3", lambda x : x.moduleByLayer[3], int),
+    NTupleVariable("moduleByLayer4", lambda x : x.moduleByLayer[4], int),
+    NTupleVariable("moduleByLayer5", lambda x : x.moduleByLayer[5], int),
+    NTupleVariable("moduleByLayer6", lambda x : x.moduleByLayer[6], int),
+    NTupleVariable("moduleByLayer7", lambda x : x.moduleByLayer[7], int),
+    NTupleVariable("moduleByLayer8", lambda x : x.moduleByLayer[8], int),
+    NTupleVariable("moduleByLayer9", lambda x : x.moduleByLayer[9], int),
+    NTupleVariable("moduleByLayer10", lambda x : x.moduleByLayer[10], int),
+    NTupleVariable("moduleByLayer11", lambda x : x.moduleByLayer[11], int),
+    NTupleVariable("moduleByLayer12", lambda x : x.moduleByLayer[12], int),
+    NTupleVariable("moduleByLayer13", lambda x : x.moduleByLayer[13], int),
+])
+
+isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ particleType, hitPatternType, hitDeDxType ], variables = [
+    NTupleVariable("charge",   lambda x : x.charge(), int),
+    NTupleVariable("dxy",   lambda x : x.dxy(), help="d_{xy} with respect to PV, in cm (with sign)"),
+    NTupleVariable("dz",    lambda x : x.dz() , help="d_{z} with respect to PV, in cm (with sign)"),
+    NTupleVariable("edxy",  lambda x : x.dxyError(), help="#sigma(d_{xy}) with respect to PV, in cm"),
+    NTupleVariable("edz", lambda x : x.dzError(), help="#sigma(d_{z}) with respect to PV, in cm"),    
+
+
+    NTupleVariable("highPurity", lambda x : x.isHighPurityTrack(), int, help="High purity"),
+
+    NTupleVariable("miniIsoCH",   lambda x : x.miniPFIsolation().chargedHadronIso(), help="Charged hadron mini-isolation"),
+    NTupleVariable("miniIsoNH",   lambda x : x.miniPFIsolation().neutralHadronIso(), help="Neutral hadron mini-isolation"),
+    NTupleVariable("miniIsoPH",   lambda x : x.miniPFIsolation().photonIso(), help="Photon mini-isolation"),
+    NTupleVariable("miniIsoPU",   lambda x : x.miniPFIsolation().puChargedHadronIso(), help="Pileup charged hadron mini-isolation"),
+    NTupleVariable("miniRelIso",   lambda x : _isoDBeta(x.miniPFIsolation())/x.pt(), help="mini-isolation (relative, PU-corrected using dBeta)"),
+    NTupleVariable("dR03IsoCH",   lambda x : x.pfIsolationDR03().chargedHadronIso(), help="Charged hadron isolation dR=0.3"),
+    NTupleVariable("dR03IsoNH",   lambda x : x.pfIsolationDR03().neutralHadronIso(), help="Neutral hadron isolation dR=0.3"),
+    NTupleVariable("dR03IsoPH",   lambda x : x.pfIsolationDR03().photonIso(), help="Photon isolation = dR=0.3"),
+    NTupleVariable("dR03IsoPU",   lambda x : x.pfIsolationDR03().puChargedHadronIso(), help="Pileup charged hadron isolation dR=0.3"),
+    NTupleVariable("relIso03",   lambda x : _isoDBeta(x.pfIsolationDR03())/x.pt(), help="relative isolation dR=0.3 (PU-corrected using dBeta)"),
+    NTupleVariable("caloEmEnergy",   lambda x : x.matchedCaloJetEmEnergy(), help="Energy in the ECAL behind the track"),
+    NTupleVariable("caloHadEnergy",   lambda x : x.matchedCaloJetHadEnergy(), help="Energy in the HCAL behind the track"),
+    NTupleVariable("channelsGoodECAL", lambda x : x.channelsGoodECAL, int, help="Flag set to 1 when the track extrapolates to all good ECAL channels"),
+    NTupleVariable("channelsGoodHCAL", lambda x : x.channelsGoodHCAL, int, help="Flag set to 1 when the track extrapolates to all good HCAL channels"),
+
+    NTupleVariable("awayJet_idx", lambda x : x.leadAwayJet.index if x.leadAwayJet else -1, int),
+    NTupleVariable("awayJet_pt", lambda x : x.leadAwayJet.pt() if x.leadAwayJet else 0),
+    NTupleVariable("awayJet_dr", lambda x : deltaR(x, x.leadAwayJet) if x.leadAwayJet else 0),
+
+    NTupleVariable("awayNJet", lambda x : x.awayJetInfo['num'], int),
+    NTupleVariable("awayHTJet", lambda x : x.awayJetInfo['ht']),
+
+    NTupleVariable("awayMu_idx", lambda x : x.leadAwayMu.index if x.leadAwayMu else -1, int),
+    NTupleVariable("awayMu_dr", lambda x : deltaR(x, x.leadAwayMu) if x.leadAwayMu else 0),
+    NTupleVariable("awayMu_mll", lambda x : (x.leadAwayMu.p4()+x.p4()).M() if x.leadAwayMu else 0),
+
+    NTupleVariable("awayEle_idx", lambda x : x.leadAwayEle.index if x.leadAwayEle else -1, int),
+    NTupleVariable("awayEle_dr", lambda x : deltaR(x, x.leadAwayEle) if x.leadAwayEle else 0),
+    NTupleVariable("awayEle_mll", lambda x : (x.leadAwayEle.p4()+x.p4()).M() if x.leadAwayEle else 0),
+
+    NTupleVariable("closestMu_idx", lambda x : x.closestMu.index if x.closestMu else -1, int),
+    NTupleVariable("closestEle_idx", lambda x : x.closestEle.index if x.closestEle else -1, int),
+    NTupleVariable("closestTau_idx", lambda x : x.closestTau.index if x.closestTau else -1, int),
+
+    NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
+
+    NTupleVariable("myDeDx", lambda x : x.myDeDx),
                                                                                                          
     NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True),
     NTupleVariable("mcMatchAnyId", lambda x : x.mcMatchAny.pdgId()*(1+99*x.mcMatchAny.isDirectPromptTauDecayProductFinalState()) if x.mcMatchAny else 0, int, mcOnly=True, help="MC pdgId of the matched gen lepton, tau, photon or chargino (for leptons from tau, it's pdgId*100)"),
     NTupleVariable("mcMatchAnyPt", lambda x : x.mcMatchAny.pt() if x.mcMatchAny else 0, int, mcOnly=True, help="MC pt of the matched gen lepton, tau, photon or chargino"),
 ]
 )
+
+calibTrackTypeDeDx = NTupleObjectType("calibTrackTypeDeDx", baseObjectTypes = [ hitPatternType, hitDeDxType ], variables = [
+    NTupleVariable("pt",   lambda x : x.pt()),
+    NTupleVariable("eta",   lambda x : x.eta()),
+    NTupleVariable("phi",   lambda x : x.phi()),
+    NTupleVariable("p",   lambda x : x.p()),
+    NTupleVariable("charge",   lambda x : x.charge(), int),
+    NTupleVariable("dxy",   lambda x : x.dxy, help="d_{xy} with respect to PV, in cm (with sign)"),
+    NTupleVariable("dz",    lambda x : x.dz , help="d_{z} with respect to PV, in cm (with sign)"),
+    NTupleVariable("edxy",  lambda x : x.dxyError(), help="#sigma(d_{xy}) with respect to PV, in cm"),
+    NTupleVariable("edz", lambda x : x.dzError(), help="#sigma(d_{z}) with respect to PV, in cm"),    
+    NTupleVariable("highPurity", lambda x : x.quality(x.highPurity), int, help="High purity"),
+    NTupleVariable("dedxPrescale", lambda x : x.dedxPrescale, int, help="Prescale factor applied when selecting this track to save dE/dx"),
+    NTupleVariable("stripDeDx", lambda x : x.stripDeDx.dEdx(), help="dE/dx in the strip detector (harmonic2 estimator)"),
+    NTupleVariable("stripDeDxErr", lambda x : x.stripDeDx.dEdxError(), help="dE/dx uncertainty in the strip detector (harmonic2 estimator)"),
+    NTupleVariable("stripDeDxN", lambda x : x.stripDeDx.numberOfMeasurements(), help="number of dE/dx measurements in the strip detector"),
+])
+
 
 ##------------------------------------------  
 ## genCharginoType
@@ -232,4 +300,17 @@ treeProducer = cfg.Analyzer(
         "genCharginos"    : NTupleCollection("GenChargino",  genCharginoType, 4, mcOnly=True, help="Gen chargino"),
         },
     )
+
+## Tree Producer
+calibTreeProducer = cfg.Analyzer(
+    AutoFillTreeProducer, name='treeProducerXtracks',
+    vectorTree = True, saveTLorentzVectors = False,  defaultFloatType = 'F', PDFWeights = [],
+    globalVariables = [
+        NTupleVariable("rho",  lambda ev: ev.rho, float, help="kt6PFJets rho"),
+        NTupleVariable("nVert",  lambda ev: len(ev.goodVertices), int, help="Number of good vertices"),
+        ],
+    collections = {
+       "tracks" : NTupleCollection("Track",  calibTrackTypeDeDx, 4, help="Isolated tracks"),
+       }
+   )
 

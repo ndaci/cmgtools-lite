@@ -433,3 +433,19 @@ xtracks_sequence = [
     
     treeProducer,
 ]
+
+vertexAnaAOD = vertexAna.clone(
+    allVertices = "offlinePrimaryVertices",
+    )
+from CMGTools.TTHAnalysis.analyzers.aodDeDxAnalyzer import aodDeDxAnalyzer
+aodDeDxAna = cfg.Analyzer(aodDeDxAnalyzer, name="aodDeDxAna",
+    trackerTopology = ( "$CMSSW_BASE/src/CMGTools/RootTools/data/trackerTopology_2017.root", "TrackerTopology_2017" )
+    )
+
+xtracks_sequence_AOD = [
+    skimAnalyzer,
+    jsonAna,
+    vertexAnaAOD,
+    aodDeDxAna,
+    calibTreeProducer
+]
