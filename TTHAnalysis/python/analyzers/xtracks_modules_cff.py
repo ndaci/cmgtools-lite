@@ -392,6 +392,7 @@ isoTrackDeDxAna = cfg.Analyzer(isoTrackDeDxAnalyzer, name="isoTrackDeDxAna",
         # for 94X MiniAOD v1, you have two options
         #  - set it to False, and have no DeDx
         #  - set it to "94XMiniAODv1-Hack" and follow step (1) of https://hypernews.cern.ch/HyperNews/CMS/get/physTools/3586/1/1/1/1.html 
+    trackerTopology = ( "$CMSSW_BASE/src/CMGTools/RootTools/data/trackerTopology_2017.root", "TrackerTopology_2017" )
     )
 
 

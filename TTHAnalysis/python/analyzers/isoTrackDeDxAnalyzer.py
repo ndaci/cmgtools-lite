@@ -1,7 +1,8 @@
+import os.path
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
-from PhysicsTools.Heppy.physicsobjects.Electron import Electron
 
+from CMGTools.RootTools.utils.trackerTopologyHelper import loadTrackerTopology
 
 from PhysicsTools.HeppyCore.utils.deltar import deltaR, matchObjectCollection3
 
@@ -22,6 +23,7 @@ def jetStats(objs):
 class isoTrackDeDxAnalyzer( Analyzer ):
     def __init__(self, cfg_ana, cfg_comp, looperName ):
         super(isoTrackDeDxAnalyzer,self).__init__(cfg_ana,cfg_comp,looperName)
+        self.topology = loadTrackerTopology(os.path.expandvars(cfg_ana.trackerTopology[0]), cfg_ana.trackerTopology[1])
 
     def declareHandles(self):
         super(isoTrackDeDxAnalyzer, self).declareHandles()
@@ -73,16 +75,13 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestEle  = closest(t, nearby(t, electrons, 0.4))
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
-            dedxArray = []
-            subDetIdArray = []
-            sizeXarray = []
-            sizeYarray = []
-            
-            for i in xrange(100):
-              dedxArray.append(0)
-              subDetIdArray.append(0)
-              sizeXarray.append(0)
-              sizeYarray.append(0)
+            t.dedxByLayer     = [0 for i in xrange(14)]
+            t.subDetIdByLayer = [0 for i in xrange(14)]
+            t.layerByLayer    = [0 for i in xrange(14)]
+            t.ladderOrBladeByLayer = [0 for i in xrange(14)]
+            t.moduleByLayer   = [0 for i in xrange(14)]
+            t.sizeXbyLayer    = [0 for i in xrange(14)]
+            t.sizeYbyLayer    = [0 for i in xrange(14)]
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -96,33 +95,38 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 # this below is just dummy to give you a template
                 mysum = 0
                 
-                for ih in xrange(nhits):
+                for ih in xrange(min(nhits,len(t.dedxByLayer))):
+                    detid = dedx.detId(ih)
                     pixelCluster = dedx.pixelCluster(ih)
                     stripCluster = dedx.stripCluster(ih)
                     if pixelCluster:
-                      dedxArray[ih] = pixelCluster.charge()/dedx.pathlength(ih)
+                      t.dedxByLayer[ih] = pixelCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
-                      dedxArray[ih] *= pixelChargeToEnergyCoefficient
+                      t.dedxByLayer[ih] *= pixelChargeToEnergyCoefficient
                       
-                      sizeXarray[ih] = pixelCluster.sizeX()
-                      sizeYarray[ih] = pixelCluster.sizeY()
-                      
+                      t.sizeXbyLayer[ih] = pixelCluster.sizeX()
+                      t.sizeYbyLayer[ih] = pixelCluster.sizeY()
+                      if detid.subdetId() == 1:
+                          t.ladderOrBladeByLayer[ih] *= self.topology.pxbLadder(detid)
+                      if detid.subdetId() == 2:
+                          t.layerByLayer[ih] *= 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                          t.ladderOrBladeByLayer[ih] *= self.topology.pxfBlade(detid)
+                      t.moduleByLayer[ih] = self.topology.module(detid)
+   
                       mysum += pixelCluster.charge()
                     if stripCluster:
-                      dedxArray[ih] = stripCluster.charge()/dedx.pathlength(ih)
+                      t.dedxByLayer[ih] = stripCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
-                      dedxArray[ih] *= stripChargeToEnergyCoefficient
-                    subDetIdArray[ih] = dedx.detId(ih).subdetId()
+                      t.dedxByLayer[ih] *= stripChargeToEnergyCoefficient
+                      t.sizeXbyLayer[ih] = stripCluster.sizeX()
+                    
+                    t.subDetIdByLayer[ih] = detid.subdetId()
+                    t.layerByLayer[ih] = self.topology.layer(detid)
 
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
 
-
-            t.dedxByLayer = dedxArray
-            t.subDetIdByLayer = subDetIdArray
-            t.sizeXbyLayer = sizeXarray
-            t.sizeYbyLayer = sizeYarray
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
