@@ -98,6 +98,10 @@ if run == "all":    selectedComponents = mcSamples + dataSamples + mcSignals
 elif run == "data": selectedComponents = dataSamples
 elif run == "mc":   selectedComponents = mcSamples
 elif run == "sig":  selectedComponents = mcSignals
+elif run == "aod":
+    from CMGTools.RootTools.samples.samples_13TeV_DATA2017_AOD import dataSamples_17Nov2017_AOD
+    selectedComponents = [ d for d in dataSamples_17Nov2017_AOD 
+                           if "DoubleMuon" in d.name or "ZeroBias" in d.name ]
 
 if run == "sig" or run == "mc" : isoTrackDeDxAna.doDeDx = True
 
@@ -109,9 +113,15 @@ if run == "mc":
     for c in  selectedComponents:
        c.splitFactor = len(c.files)/2
 
+if run == "aod":
+    prescaleComponents(selectedComponents, int(getHeppyOption("prescale","1")))
+    configureSplittingFromTime(selectedComponents, 50, 2.5, maxFiles=4)
 
 #-------- SEQUENCE -----------
 sequence = cfg.Sequence( xtracks_sequence )
+if run == "aod":
+    sequence = cfg.Sequence( xtracks_sequence_AOD )
+
 
 #-------- HOW TO RUN -----------
 test = getHeppyOption('test')
@@ -134,6 +144,14 @@ elif test == "1S":
     fastJetSkim.minJets = 0
     isoTrackDeDxAna.doDeDx = True
     comp.triggers = []
+elif test == "1A":
+    comp = dataSamples[0]
+    comp.name = "AOD"
+    comp.files = [ '/eos/cms/store/cmst3/user/gpetrucc/Run2017D_ZeroBias_17Nov2017_AOD.root' ]
+    comp.triggers = []
+    sequence = cfg.Sequence( xtracks_sequence_AOD )
+    selectedComponents = doTest1(comp, sequence=sequence, cache=False )
+    print "The test wil use file %s " % comp.files[0]
 elif test in ('2','3','5s'):
     doTestN(test,selectedComponents)
 
