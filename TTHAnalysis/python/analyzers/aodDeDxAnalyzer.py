@@ -44,13 +44,13 @@ class aodDeDxAnalyzer( Analyzer ):
             ref = getref(itk)
             if ref.isNull(): continue
 
-            tk.dedxByLayer     = [0 for i in xrange(20)]
-            tk.subDetIdByLayer = [0 for i in xrange(20)]
-            tk.layerByLayer    = [0 for i in xrange(20)]
+            tk.dedxByLayer          = [0 for i in xrange(20)]
+            tk.subDetIdByLayer      = [0 for i in xrange(20)]
+            tk.layerOrSideByLayer   = [0 for i in xrange(20)]
             tk.ladderOrBladeByLayer = [0 for i in xrange(20)]
-            tk.moduleByLayer   = [0 for i in xrange(20)]
-            tk.sizeXbyLayer    = [0 for i in xrange(20)]
-            tk.sizeYbyLayer    = [0 for i in xrange(20)]
+            tk.moduleByLayer        = [0 for i in xrange(20)]
+            tk.sizeXbyLayer         = [0 for i in xrange(20)]
+            tk.sizeYbyLayer         = [0 for i in xrange(20)]
  
             tracks.append(tk)
             tk.dedx = ref.get()
@@ -69,11 +69,11 @@ class aodDeDxAnalyzer( Analyzer ):
                     tk.sizeYbyLayer[ifound]    = pixelCluster.sizeY()
                     detid = tk.dedx.detId(ih)
                     tk.subDetIdByLayer[ifound] = detid.subdetId()
-                    tk.layerByLayer[ifound] = self.topology.layer(detid) 
+                    tk.layerOrSideByLayer[ifound] = self.topology.layer(detid) 
                     if detid.subdetId() == 1: 
                         tk.ladderOrBladeByLayer[ifound] *= self.topology.pxbLadder(detid)
                     if detid.subdetId() == 2: 
-                        tk.layerByLayer[ifound] *= 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                        tk.layerOrSideByLayer[ifound] *= 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
                         tk.ladderOrBladeByLayer[ifound] *= self.topology.pxfBlade(detid)
                     tk.moduleByLayer[ifound] = self.topology.module(detid) 
                  

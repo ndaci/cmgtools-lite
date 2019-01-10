@@ -75,13 +75,15 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestEle  = closest(t, nearby(t, electrons, 0.4))
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
-            t.dedxByLayer     = [0 for i in xrange(14)]
-            t.subDetIdByLayer = [0 for i in xrange(14)]
-            t.layerByLayer    = [0 for i in xrange(14)]
-            t.ladderOrBladeByLayer = [0 for i in xrange(14)]
-            t.moduleByLayer   = [0 for i in xrange(14)]
-            t.sizeXbyLayer    = [0 for i in xrange(14)]
-            t.sizeYbyLayer    = [0 for i in xrange(14)]
+            t.dedxByLayer           = [0 for i in xrange(14)]
+            t.subDetIdByLayer       = [0 for i in xrange(14)]
+            t.pixByLayer            = [0 for i in xrange(14)]    # 0 = strips, 1 = bpix, 2 = fpix
+            t.layerOrSideByLayer    = [0 for i in xrange(14)]
+            t.ladderOrBladeByLayer  = [0 for i in xrange(14)]
+            t.diskByLayer           = [0 for i in xrange(14)]
+            t.moduleByLayer         = [0 for i in xrange(14)]
+            t.sizeXbyLayer          = [0 for i in xrange(14)]
+            t.sizeYbyLayer          = [0 for i in xrange(14)]
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -106,22 +108,32 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                       
                       t.sizeXbyLayer[ih] = pixelCluster.sizeX()
                       t.sizeYbyLayer[ih] = pixelCluster.sizeY()
+                      
+                      # barrel
                       if detid.subdetId() == 1:
-                          t.ladderOrBladeByLayer[ih] *= self.topology.pxbLadder(detid)
+                          t.layerOrSideByLayer[ih] = self.topology.layer(detid)
+                          t.ladderOrBladeByLayer[ih] = self.topology.pxbLadder(detid)
+                          t.pixByLayer[ih] = 1
+                     
+                      # endcap
                       if detid.subdetId() == 2:
-                          t.layerByLayer[ih] *= 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
-                          t.ladderOrBladeByLayer[ih] *= self.topology.pxfBlade(detid)
+                          t.layerOrSideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                          t.ladderOrBladeByLayer[ih] = self.topology.pxfBlade(detid)
+                          t.diskByLayer[ih]          = self.topology.pxfDisk(detid)
+                          t.pixByLayer[ih] = 2
                       t.moduleByLayer[ih] = self.topology.module(detid)
    
                       mysum += pixelCluster.charge()
+
+                    # strips                      
                     if stripCluster:
                       t.dedxByLayer[ih] = stripCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
                       t.dedxByLayer[ih] *= stripChargeToEnergyCoefficient
-                      t.sizeXbyLayer[ih] = stripCluster.sizeX()
+                      #t.sizeXbyLayer[ih] = stripCluster.sizeX() --> 'SiStripCluster' object has no attribute 'sizeX'
+                      t.layerOrSideByLayer[ih] = self.topology.layer(detid)
                     
                     t.subDetIdByLayer[ih] = detid.subdetId()
-                    t.layerByLayer[ih] = self.topology.layer(detid)
 
                 t.myDeDx = mysum
             else:
