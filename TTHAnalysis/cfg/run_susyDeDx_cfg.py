@@ -105,6 +105,12 @@ elif run == "aod":
 
 if run == "sig" or run == "mc" : isoTrackDeDxAna.doDeDx = True
 
+# apply de/dx calibration if run on data
+if run == "data" :
+    isoTrackDeDxAna.doCalibrateScaleDeDx = True
+
+
+
 if run == "data":
     for c in  selectedComponents:
        c.splitFactor = len(c.files)/3
@@ -143,6 +149,16 @@ elif test == "1S":
     print "The test wil use file %s " % comp.files[0]
     fastJetSkim.minJets = 0
     isoTrackDeDxAna.doDeDx = True
+    comp.triggers = []
+elif test == "1D":
+    comp = dataSamples[0]
+    #comp.files = [ ': /store/data/Run2017D/DoubleEG/MINIAOD/31Mar2018-v1/00000/C0914411-F636-E811-8796-44A84225D36F.root ' ]
+    comp.files = [ '/tmp/amassiro/test3.root ' ]
+    selectedComponents = doTest1(comp, sequence=sequence, cache=False )
+    print "The test wil use file %s " % comp.files[0]
+    fastJetSkim.minJets = 0
+    isoTrackDeDxAna.doDeDx = True
+    isoTrackDeDxAna.doCalibrateScaleDeDx = True
     comp.triggers = []
 elif test == "1A":
     comp = dataSamples[0]

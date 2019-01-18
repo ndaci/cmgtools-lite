@@ -90,6 +90,21 @@ hitDeDxType = NTupleObjectType("hitDeDxType", baseObjectTypes = [], variables = 
     NTupleVariable("dedxByLayer11", lambda x : x.dedxByLayer[11]),
     NTupleVariable("dedxByLayer12", lambda x : x.dedxByLayer[12]),
     NTupleVariable("dedxByLayer13", lambda x : x.dedxByLayer[13]),
+
+    NTupleVariable("dedxUnSmearedByLayer0", lambda x : x.dedxUnSmearedByLayer[0]),
+    NTupleVariable("dedxUnSmearedByLayer1", lambda x : x.dedxUnSmearedByLayer[1]),
+    NTupleVariable("dedxUnSmearedByLayer2", lambda x : x.dedxUnSmearedByLayer[2]),
+    NTupleVariable("dedxUnSmearedByLayer3", lambda x : x.dedxUnSmearedByLayer[3]),
+    NTupleVariable("dedxUnSmearedByLayer4", lambda x : x.dedxUnSmearedByLayer[4]),
+    NTupleVariable("dedxUnSmearedByLayer5", lambda x : x.dedxUnSmearedByLayer[5]),
+    NTupleVariable("dedxUnSmearedByLayer6", lambda x : x.dedxUnSmearedByLayer[6]),
+    NTupleVariable("dedxUnSmearedByLayer7", lambda x : x.dedxUnSmearedByLayer[7]),
+    NTupleVariable("dedxUnSmearedByLayer8", lambda x : x.dedxUnSmearedByLayer[8]),
+    NTupleVariable("dedxUnSmearedByLayer9", lambda x : x.dedxUnSmearedByLayer[9]),
+    NTupleVariable("dedxUnSmearedByLayer10", lambda x : x.dedxUnSmearedByLayer[10]),
+    NTupleVariable("dedxUnSmearedByLayer11", lambda x : x.dedxUnSmearedByLayer[11]),
+    NTupleVariable("dedxUnSmearedByLayer12", lambda x : x.dedxUnSmearedByLayer[12]),
+    NTupleVariable("dedxUnSmearedByLayer13", lambda x : x.dedxUnSmearedByLayer[13]),
     
     NTupleVariable("subDetIdByLayer0", lambda x : x.subDetIdByLayer[0], int),
     NTupleVariable("subDetIdByLayer1", lambda x : x.subDetIdByLayer[1], int),
@@ -166,20 +181,20 @@ hitDeDxType = NTupleObjectType("hitDeDxType", baseObjectTypes = [], variables = 
     NTupleVariable("ladderOrBladeByLayer12", lambda x : x.ladderOrBladeByLayer[12], int),
     NTupleVariable("ladderOrBladeByLayer13", lambda x : x.ladderOrBladeByLayer[13], int),
 
-    NTupleVariable("moduleByLayer0", lambda x : x.moduleByLayer[0], int),
-    NTupleVariable("moduleByLayer1", lambda x : x.moduleByLayer[1], int),
-    NTupleVariable("moduleByLayer2", lambda x : x.moduleByLayer[2], int),
-    NTupleVariable("moduleByLayer3", lambda x : x.moduleByLayer[3], int),
-    NTupleVariable("moduleByLayer4", lambda x : x.moduleByLayer[4], int),
-    NTupleVariable("moduleByLayer5", lambda x : x.moduleByLayer[5], int),
-    NTupleVariable("moduleByLayer6", lambda x : x.moduleByLayer[6], int),
-    NTupleVariable("moduleByLayer7", lambda x : x.moduleByLayer[7], int),
-    NTupleVariable("moduleByLayer8", lambda x : x.moduleByLayer[8], int),
-    NTupleVariable("moduleByLayer9", lambda x : x.moduleByLayer[9], int),
-    NTupleVariable("moduleByLayer10", lambda x : x.moduleByLayer[10], int),
-    NTupleVariable("moduleByLayer11", lambda x : x.moduleByLayer[11], int),
-    NTupleVariable("moduleByLayer12", lambda x : x.moduleByLayer[12], int),
-    NTupleVariable("moduleByLayer13", lambda x : x.moduleByLayer[13], int),
+    #NTupleVariable("moduleByLayer0", lambda x : x.moduleByLayer[0], int),        # not used so far
+    #NTupleVariable("moduleByLayer1", lambda x : x.moduleByLayer[1], int),        # not used so far
+    #NTupleVariable("moduleByLayer2", lambda x : x.moduleByLayer[2], int),        # not used so far
+    #NTupleVariable("moduleByLayer3", lambda x : x.moduleByLayer[3], int),        # not used so far
+    #NTupleVariable("moduleByLayer4", lambda x : x.moduleByLayer[4], int),        # not used so far
+    #NTupleVariable("moduleByLayer5", lambda x : x.moduleByLayer[5], int),        # not used so far
+    #NTupleVariable("moduleByLayer6", lambda x : x.moduleByLayer[6], int),        # not used so far
+    #NTupleVariable("moduleByLayer7", lambda x : x.moduleByLayer[7], int),        # not used so far
+    #NTupleVariable("moduleByLayer8", lambda x : x.moduleByLayer[8], int),        # not used so far
+    #NTupleVariable("moduleByLayer9", lambda x : x.moduleByLayer[9], int),        # not used so far
+    #NTupleVariable("moduleByLayer10", lambda x : x.moduleByLayer[10], int),      # not used so far
+    #NTupleVariable("moduleByLayer11", lambda x : x.moduleByLayer[11], int),      # not used so far
+    #NTupleVariable("moduleByLayer12", lambda x : x.moduleByLayer[12], int),      # not used so far
+    #NTupleVariable("moduleByLayer13", lambda x : x.moduleByLayer[13], int),      # not used so far
 
     NTupleVariable("pixByLayer0", lambda x : x.pixByLayer[0], int),
     NTupleVariable("pixByLayer1", lambda x : x.pixByLayer[1], int),
