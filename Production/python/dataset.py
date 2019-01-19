@@ -158,9 +158,9 @@ class CMSDataset( BaseDataset ):
             query += "  instance=prod/%s" % self.dbsInstance
         dbs='dasgoclient --query="file %s=%s"'%(qwhat,query) # files must be valid
         if begin >= 0:
-            dbs += ' --index %d' % begin
+            dbs += ' --idx %d' % begin
         if end >= 0:
-            dbs += ' --limit %d' % (end-begin+1)
+            dbs += ' --limit %d' % (end+1)
         else:
             dbs += ' --limit 0' 
         dbsOut = _dasPopen(dbs)
@@ -184,7 +184,7 @@ class CMSDataset( BaseDataset ):
         if num_files == -1:
             raise RuntimeError, "Error querying DAS for dataset %r" % self.name.rstrip('/')
         
-        limit = 10000
+        limit = 50000
         if num_files > limit:
             if self.json is not None:
                 print "WARNING: the json file will be ignored for this data set. (to be implemented)"
@@ -246,7 +246,12 @@ class CMSDataset( BaseDataset ):
         if dbsInstance != None:
             query += "  instance=prod/%s" % dbsInstance
         dbs='dasgoclient --query="summary %s=%s" --format=json'%(qwhat,query)
-        jdata = json.load(_dasPopen(dbs))['data']
+        try:
+            jdata = json.load(_dasPopen(dbs))['data']
+        except ValueError as err:
+            err=['cannot decode json obtained from das']
+            err.append(_dasPopen(dbs).read())
+            raise ValueError('\n'.join(err))
         events = []
         files = []
         lumis = []

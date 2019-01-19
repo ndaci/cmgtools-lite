@@ -1,7 +1,8 @@
+import os.path
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
-from PhysicsTools.Heppy.physicsobjects.Electron import Electron
 
+from CMGTools.RootTools.utils.trackerTopologyHelper import loadTrackerTopology
 
 from PhysicsTools.HeppyCore.utils.deltar import deltaR, matchObjectCollection3
 
@@ -19,9 +20,79 @@ def jetStats(objs):
     return dict( ht = sum((o.pt() for o in objs), 0),
                  num = len(objs) )
 
+import random
+
+
+import pandas as pd 
+
+#
+# Calibration of dE/dx for data
+#
+
+cmssw_base = os.getenv('CMSSW_BASE')
+scale_file = cmssw_base + "/src/CMGTools/TTHAnalysis/data/scale_for_cmssw.txt"
+scale_file_values = pd.read_csv(scale_file, delim_whitespace=True, comment='#', header = None)
+scale_file_values.columns = ["pix", "layerorside", "ladderorblade", "etaMin", "etaMax", "irunMin", "irunMax", "value"]
+
+def scaleDedx( dedx, pix, layerorside, ladderorblade, eta, irun) :
+  scale = scaleFactor (pix, layerorside, ladderorblade, eta, irun)
+  return dedx * scale
+
+def scaleFactor( pix, layerorside, ladderorblade, eta, irun ) :
+  df = scale_file_values
+  df_result = df[ (pix == df['pix']) &   
+                  (layerorside == df['layerorside']) &   
+                  (ladderorblade == df['ladderorblade']) &   
+                  (eta >= df['etaMin']) & (eta < df['etaMax']) &   
+                  (irun >= df['irunMin']) & (irun < df['irunMax'])                  
+                  ]
+  if len(df_result.index) == 0 :
+    # if not defined scale = 1
+    return 1.0  
+  else :
+    return df_result.iloc[0]['value']
+    
+
+#
+# Smearing of dE/dx for MC
+#
+
+smear_file = cmssw_base + "/src/CMGTools/TTHAnalysis/data/smear_for_cmssw.txt"
+smear_file_values = pd.read_csv(smear_file, delim_whitespace=True, comment='#', header = None)
+smear_file_values.columns = ["pix", "layerorside", "etaMin", "etaMax", "value", "iedge"]
+
+
+def smearDedx( dedx, pix, layerorside, ladderorblade, eta) :
+  sigmarel = smearFactor (pix, layerorside, eta)
+  if sigmarel != 0:
+    smearing = random.gauss(1.0, sigmarel)
+  else :
+    smearing = 1.0
+  if smearing<=0: smearing = 1 # remove unphysical behaviour
+  return dedx * smearing
+
+def smearFactor( pix, layerorside, eta ) :
+  df = smear_file_values
+  df_result = df[ (pix == df['pix']) &   
+                  (layerorside == df['layerorside']) &   
+                  (eta >= df['etaMin']) & (eta < df['etaMax'])
+                  ]
+  if len(df_result.index) == 0 :
+    # if not defined smear = 0
+    return 0.0  
+  else :
+    return df_result.iloc[0]['value']
+
+
+
+
+
+
+
 class isoTrackDeDxAnalyzer( Analyzer ):
     def __init__(self, cfg_ana, cfg_comp, looperName ):
         super(isoTrackDeDxAnalyzer,self).__init__(cfg_ana,cfg_comp,looperName)
+        self.topology = loadTrackerTopology(os.path.expandvars(cfg_ana.trackerTopology[0]), cfg_ana.trackerTopology[1])
 
     def declareHandles(self):
         super(isoTrackDeDxAnalyzer, self).declareHandles()
@@ -73,16 +144,16 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestEle  = closest(t, nearby(t, electrons, 0.4))
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
-            dedxArray = []
-            subDetIdArray = []
-            sizeXarray = []
-            sizeYarray = []
-            
-            for i in xrange(100):
-              dedxArray.append(0)
-              subDetIdArray.append(0)
-              sizeXarray.append(0)
-              sizeYarray.append(0)
+            t.dedxByLayer           = [0 for i in xrange(14)]
+            t.dedxUnSmearedByLayer  = [0 for i in xrange(14)]    # unsmeared dedx. For MC the dedx is smeared according to data/mc discrepancy, but the unsmeared is kept for future use
+            t.subDetIdByLayer       = [0 for i in xrange(14)]
+            t.pixByLayer            = [0 for i in xrange(14)]    # 0 = strips, 1 = bpix, 2 = fpix
+            t.layerOrSideByLayer    = [0 for i in xrange(14)]
+            t.ladderOrBladeByLayer  = [0 for i in xrange(14)]
+            t.diskByLayer           = [0 for i in xrange(14)]
+            t.moduleByLayer         = [0 for i in xrange(14)]
+            t.sizeXbyLayer          = [0 for i in xrange(14)]
+            t.sizeYbyLayer          = [0 for i in xrange(14)]
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -96,33 +167,62 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 # this below is just dummy to give you a template
                 mysum = 0
                 
-                for ih in xrange(nhits):
+                for ih in xrange(min(nhits,len(t.dedxByLayer))):
+                    detid = dedx.detId(ih)
                     pixelCluster = dedx.pixelCluster(ih)
                     stripCluster = dedx.stripCluster(ih)
                     if pixelCluster:
-                      dedxArray[ih] = pixelCluster.charge()/dedx.pathlength(ih)
+                      t.dedxByLayer[ih] = pixelCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
-                      dedxArray[ih] *= pixelChargeToEnergyCoefficient
+                      t.dedxByLayer[ih] *= pixelChargeToEnergyCoefficient
                       
-                      sizeXarray[ih] = pixelCluster.sizeX()
-                      sizeYarray[ih] = pixelCluster.sizeY()
+                      t.sizeXbyLayer[ih] = pixelCluster.sizeX()
+                      t.sizeYbyLayer[ih] = pixelCluster.sizeY()
                       
+                      # barrel
+                      if detid.subdetId() == 1:
+                          t.layerOrSideByLayer[ih] = self.topology.layer(detid)
+                          t.ladderOrBladeByLayer[ih] = self.topology.pxbLadder(detid)
+                          t.pixByLayer[ih] = 1
+                     
+                      # endcap
+                      if detid.subdetId() == 2:
+                          t.layerOrSideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                          t.ladderOrBladeByLayer[ih] = self.topology.pxfBlade(detid)
+                          t.diskByLayer[ih]          = self.topology.pxfDisk(detid)
+                          t.pixByLayer[ih] = 2
+                      t.moduleByLayer[ih] = self.topology.module(detid)
+   
                       mysum += pixelCluster.charge()
+
+                    # strips                      
                     if stripCluster:
-                      dedxArray[ih] = stripCluster.charge()/dedx.pathlength(ih)
+                      t.dedxByLayer[ih] = stripCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
-                      dedxArray[ih] *= stripChargeToEnergyCoefficient
-                    subDetIdArray[ih] = dedx.detId(ih).subdetId()
+                      t.dedxByLayer[ih] *= stripChargeToEnergyCoefficient
+                      #t.sizeXbyLayer[ih] = stripCluster.sizeX() --> 'SiStripCluster' object has no attribute 'sizeX'
+                      t.layerOrSideByLayer[ih] = self.topology.layer(detid)
+                    
+                    t.subDetIdByLayer[ih] = detid.subdetId()
+
+                    # save unsmeared and smear (for MC) and the un-scaled (for Data)
+                    t.dedxUnSmearedByLayer[ih] = t.dedxByLayer[ih]
+                    
+                    if self.cfg_comp.isMC: # if MC
+                      if pixelCluster: # if pixel
+                        t.dedxByLayer[ih] = smearDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], t.eta() )
+
+                    #print " run = ", event.run 
+                    if not self.cfg_comp.isMC: # if data
+                      if self.cfg_ana.doCalibrateScaleDeDx: # if scale activated
+                        if pixelCluster: # if pixel
+                          t.dedxByLayer[ih] = scaleDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], t.eta(), event.run )
+
 
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
 
-
-            t.dedxByLayer = dedxArray
-            t.subDetIdByLayer = subDetIdArray
-            t.sizeXbyLayer = sizeXarray
-            t.sizeYbyLayer = sizeYarray
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1
