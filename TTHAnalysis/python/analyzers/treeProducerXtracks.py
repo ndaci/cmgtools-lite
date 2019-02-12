@@ -181,6 +181,23 @@ hitDeDxType = NTupleObjectType("hitDeDxType", baseObjectTypes = [], variables = 
     NTupleVariable("ladderOrBladeByLayer12", lambda x : x.ladderOrBladeByLayer[12], int),
     NTupleVariable("ladderOrBladeByLayer13", lambda x : x.ladderOrBladeByLayer[13], int),
 
+    NTupleVariable("sideByLayer0", lambda x : x.sideByLayer[0], int),
+    NTupleVariable("sideByLayer1", lambda x : x.sideByLayer[1], int),
+    NTupleVariable("sideByLayer2", lambda x : x.sideByLayer[2], int),
+    NTupleVariable("sideByLayer3", lambda x : x.sideByLayer[3], int),
+    NTupleVariable("sideByLayer4", lambda x : x.sideByLayer[4], int),
+    NTupleVariable("sideByLayer5", lambda x : x.sideByLayer[5], int),
+    NTupleVariable("sideByLayer6", lambda x : x.sideByLayer[6], int),
+    NTupleVariable("sideByLayer7", lambda x : x.sideByLayer[7], int),
+    NTupleVariable("sideByLayer8", lambda x : x.sideByLayer[8], int),
+    NTupleVariable("sideByLayer9", lambda x : x.sideByLayer[9], int),
+    NTupleVariable("sideByLayer10", lambda x : x.sideByLayer[10], int),
+    NTupleVariable("sideByLayer11", lambda x : x.sideByLayer[11], int),
+    NTupleVariable("sideByLayer12", lambda x : x.sideByLayer[12], int),
+    NTupleVariable("sideByLayer13", lambda x : x.sideByLayer[13], int),
+
+
+
     #NTupleVariable("moduleByLayer0", lambda x : x.moduleByLayer[0], int),        # not used so far
     #NTupleVariable("moduleByLayer1", lambda x : x.moduleByLayer[1], int),        # not used so far
     #NTupleVariable("moduleByLayer2", lambda x : x.moduleByLayer[2], int),        # not used so far

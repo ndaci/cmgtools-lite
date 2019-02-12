@@ -61,11 +61,13 @@ if region == "sr":
     mcSignals = Winos
     mcTriggers = triggers_SOS_highMET[:] 
 elif region == "cr1l": 
-    mcSamples =  ( QCD
-                 + Ws
-                 + Zll 
-                 + VV
-                 + Top)
+    mcSamples =  (
+                   #QCD
+                 #+ Ws
+                 Zll 
+                 #+ VV
+                 #+ Top
+                 )
     mcTriggers = triggers_1mu_iso + triggers_1e_iso + triggers_1e_noniso
     mcSignals = []
 
@@ -79,8 +81,9 @@ from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
 if region == "sr":   
     datasetsAndTriggers = [ ("MET", triggers_SOS_highMET) ]
 elif region == "cr1l":   
-    datasetsAndTriggers = [ ("SingleMuon", triggers_1mu_iso),
-                            ("SingleElectron", triggers_1e_iso + triggers_1e_noniso) ]
+    datasetsAndTriggers = [ ("SingleMuon", triggers_1mu_iso) #,
+                            #("SingleElectron", triggers_1e_iso + triggers_1e_noniso)
+                          ]
 
 json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 dataSamples = []; vetoTriggers = []
