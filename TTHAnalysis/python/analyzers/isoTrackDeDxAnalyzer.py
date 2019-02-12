@@ -48,8 +48,10 @@ def scaleFactor( pix, layerorside, ladderorblade, eta, irun ) :
                   ]
   if len(df_result.index) == 0 :
     # if not defined scale = 1
+    #print " pix, layerorside, ladderorblade, eta, irun = ", pix, " ", layerorside, " ", ladderorblade, " ", eta, " ", irun, " ---> NONE " 
     return 1.0  
   else :
+    #print " pix, layerorside, ladderorblade, eta, irun = ", pix, " ", layerorside, " ", ladderorblade, " ", eta, " ", irun, " ---> " , df_result.iloc[0]['value']
     return df_result.iloc[0]['value']
     
 
@@ -151,6 +153,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.layerOrSideByLayer    = [0 for i in xrange(14)]
             t.ladderOrBladeByLayer  = [0 for i in xrange(14)]
             t.diskByLayer           = [0 for i in xrange(14)]
+            t.sideByLayer           = [0 for i in xrange(14)]
             t.moduleByLayer         = [0 for i in xrange(14)]
             t.sizeXbyLayer          = [0 for i in xrange(14)]
             t.sizeYbyLayer          = [0 for i in xrange(14)]
@@ -187,9 +190,11 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                      
                       # endcap
                       if detid.subdetId() == 2:
-                          t.layerOrSideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                          t.layerOrSideByLayer[ih] = self.topology.pxfDisk(detid)
+                          #t.layerOrSideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
                           t.ladderOrBladeByLayer[ih] = self.topology.pxfBlade(detid)
                           t.diskByLayer[ih]          = self.topology.pxfDisk(detid)
+                          t.sideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
                           t.pixByLayer[ih] = 2
                       t.moduleByLayer[ih] = self.topology.module(detid)
    
@@ -210,13 +215,13 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                     
                     if self.cfg_comp.isMC: # if MC
                       if pixelCluster: # if pixel
-                        t.dedxByLayer[ih] = smearDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], t.eta() )
+                        t.dedxByLayer[ih] = smearDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], abs(t.eta()) )
 
                     #print " run = ", event.run 
                     if not self.cfg_comp.isMC: # if data
                       if self.cfg_ana.doCalibrateScaleDeDx: # if scale activated
                         if pixelCluster: # if pixel
-                          t.dedxByLayer[ih] = scaleDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], t.eta(), event.run )
+                          t.dedxByLayer[ih] = scaleDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], abs(t.eta()), event.run )
 
 
                 t.myDeDx = mysum
