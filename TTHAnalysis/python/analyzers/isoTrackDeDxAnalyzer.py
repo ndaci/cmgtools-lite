@@ -146,17 +146,17 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestEle  = closest(t, nearby(t, electrons, 0.4))
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
-            t.dedxByLayer           = [0 for i in xrange(14)]
-            t.dedxUnSmearedByLayer  = [0 for i in xrange(14)]    # unsmeared dedx. For MC the dedx is smeared according to data/mc discrepancy, but the unsmeared is kept for future use
-            t.subDetIdByLayer       = [0 for i in xrange(14)]
-            t.pixByLayer            = [0 for i in xrange(14)]    # 0 = strips, 1 = bpix, 2 = fpix
-            t.layerOrSideByLayer    = [0 for i in xrange(14)]
-            t.ladderOrBladeByLayer  = [0 for i in xrange(14)]
-            t.diskByLayer           = [0 for i in xrange(14)]
-            t.sideByLayer           = [0 for i in xrange(14)]
-            t.moduleByLayer         = [0 for i in xrange(14)]
-            t.sizeXbyLayer          = [0 for i in xrange(14)]
-            t.sizeYbyLayer          = [0 for i in xrange(14)]
+            t.dedxByHit           = [0 for i in xrange(14)]
+            t.dedxUnSmearedByHit  = [0 for i in xrange(14)]    # unsmeared dedx. For MC the dedx is smeared according to data/mc discrepancy, but the unsmeared is kept for future use
+            t.subDetIdByHit       = [0 for i in xrange(14)]
+            t.pixByHit            = [0 for i in xrange(14)]    # 0 = strips, 1 = bpix, 2 = fpix
+            t.layerOrSideByHit    = [0 for i in xrange(14)]
+            t.ladderOrBladeByHit  = [0 for i in xrange(14)]
+            t.diskByHit           = [0 for i in xrange(14)]
+            t.sideByHit           = [0 for i in xrange(14)]
+            t.moduleByHit         = [0 for i in xrange(14)]
+            t.sizeXbyHit          = [0 for i in xrange(14)]
+            t.sizeYbyHit          = [0 for i in xrange(14)]
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -170,58 +170,58 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                 # this below is just dummy to give you a template
                 mysum = 0
                 
-                for ih in xrange(min(nhits,len(t.dedxByLayer))):
+                for ih in xrange(min(nhits,len(t.dedxByHit))):
                     detid = dedx.detId(ih)
                     pixelCluster = dedx.pixelCluster(ih)
                     stripCluster = dedx.stripCluster(ih)
                     if pixelCluster:
-                      t.dedxByLayer[ih] = pixelCluster.charge()/dedx.pathlength(ih)
+                      t.dedxByHit[ih] = pixelCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
-                      t.dedxByLayer[ih] *= pixelChargeToEnergyCoefficient
+                      t.dedxByHit[ih] *= pixelChargeToEnergyCoefficient
                       
-                      t.sizeXbyLayer[ih] = pixelCluster.sizeX()
-                      t.sizeYbyLayer[ih] = pixelCluster.sizeY()
+                      t.sizeXbyHit[ih] = pixelCluster.sizeX()
+                      t.sizeYbyHit[ih] = pixelCluster.sizeY()
                       
                       # barrel
                       if detid.subdetId() == 1:
-                          t.layerOrSideByLayer[ih] = self.topology.layer(detid)
-                          t.ladderOrBladeByLayer[ih] = self.topology.pxbLadder(detid)
-                          t.pixByLayer[ih] = 1
+                          t.layerOrSideByHit[ih] = self.topology.layer(detid)
+                          t.ladderOrBladeByHit[ih] = self.topology.pxbLadder(detid)
+                          t.pixByHit[ih] = 1
                      
                       # endcap
                       if detid.subdetId() == 2:
-                          t.layerOrSideByLayer[ih] = self.topology.pxfDisk(detid)
-                          #t.layerOrSideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
-                          t.ladderOrBladeByLayer[ih] = self.topology.pxfBlade(detid)
-                          t.diskByLayer[ih]          = self.topology.pxfDisk(detid)
-                          t.sideByLayer[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
-                          t.pixByLayer[ih] = 2
-                      t.moduleByLayer[ih] = self.topology.module(detid)
+                          t.layerOrSideByHit[ih] = self.topology.pxfDisk(detid)
+                          #t.layerOrSideByHit[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                          t.ladderOrBladeByHit[ih] = self.topology.pxfBlade(detid)
+                          t.diskByHit[ih]          = self.topology.pxfDisk(detid)
+                          t.sideByHit[ih] = 2*self.topology.side(detid)-3 # side is 2 for eta > 0, 1 for eta < 0 -> map to +1, -1
+                          t.pixByHit[ih] = 2
+                      t.moduleByHit[ih] = self.topology.module(detid)
    
                       mysum += pixelCluster.charge()
 
                     # strips                      
                     if stripCluster:
-                      t.dedxByLayer[ih] = stripCluster.charge()/dedx.pathlength(ih)
+                      t.dedxByHit[ih] = stripCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
-                      t.dedxByLayer[ih] *= stripChargeToEnergyCoefficient
-                      #t.sizeXbyLayer[ih] = stripCluster.sizeX() --> 'SiStripCluster' object has no attribute 'sizeX'
-                      t.layerOrSideByLayer[ih] = self.topology.layer(detid)
+                      t.dedxByHit[ih] *= stripChargeToEnergyCoefficient
+                      #t.sizeXbyHit[ih] = stripCluster.sizeX() --> 'SiStripCluster' object has no attribute 'sizeX'
+                      t.layerOrSideByHit[ih] = self.topology.layer(detid)
                     
-                    t.subDetIdByLayer[ih] = detid.subdetId()
+                    t.subDetIdByHit[ih] = detid.subdetId()
 
                     # save unsmeared and smear (for MC) and the un-scaled (for Data)
-                    t.dedxUnSmearedByLayer[ih] = t.dedxByLayer[ih]
+                    t.dedxUnSmearedByHit[ih] = t.dedxByHit[ih]
                     
                     if self.cfg_comp.isMC: # if MC
                       if pixelCluster: # if pixel
-                        t.dedxByLayer[ih] = smearDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], abs(t.eta()) )
+                        t.dedxByHit[ih] = smearDedx( t.dedxByHit[ih], t.pixByHit[ih], t.layerOrSideByHit[ih], t.ladderOrBladeByHit[ih], abs(t.eta()) )
 
                     #print " run = ", event.run 
                     if not self.cfg_comp.isMC: # if data
                       if self.cfg_ana.doCalibrateScaleDeDx: # if scale activated
                         if pixelCluster: # if pixel
-                          t.dedxByLayer[ih] = scaleDedx( t.dedxByLayer[ih], t.pixByLayer[ih], t.layerOrSideByLayer[ih], t.ladderOrBladeByLayer[ih], abs(t.eta()), event.run )
+                          t.dedxByHit[ih] = scaleDedx( t.dedxByHit[ih], t.pixByHit[ih], t.layerOrSideByHit[ih], t.ladderOrBladeByHit[ih], abs(t.eta()), event.run )
 
 
                 t.myDeDx = mysum
