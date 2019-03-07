@@ -1,0 +1,22 @@
+# vim: syntax=sh
+HLT : HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+
+LepVeto: nLepGood == 0
+TauVeto: nTauGood == 0
+
+MET200 : met_pt > 200
+
+Jet100 : Jet_pt[0] > 100    # these are central jets and are already pT sorted
+FwdLeadingJetVeto : Alt$(JetFwd_pt[0],0) < Jet_pt[0] # veto cases where the leading Fwd jet is harder than the central jet
+JetID : Jet_chHEF[0] > 0.1 && Jet_neHEF[0] < 0.8
+BTagVeto : Sum$(Jet_btagDeepCSV > 0.4941 && Jet_pt > 30) == 0
+JetMETPhiVeto: Sum$(deltaPhi(Jet_phi,met_phi) < 0.5 && Jet_pt > 30) == 0
+
+
+Track: IsoTrack_pt > 50 && abs(IsoTrack_eta) < 2.4 && IsoTrack_highPurity
+PFIso: IsoTrack_dR03IsoCH + max(0, IsoTrack_dR03IsoNH+IsoTrack_dR03IsoPH-0.5*IsoTrack_dR03IsoPU) < 0.15 * IsoTrack_pt
+3Pix : IsoTrack_pixelLayers >= 3
+NoLost : IsoTrack_missingInnerTrackerHits == 0 && IsoTrack_missingMiddleTrackerHits == 0
+
+NoStrips : IsoTrack_pixelHits == IsoTrack_trackerHits; Disable=True
+
