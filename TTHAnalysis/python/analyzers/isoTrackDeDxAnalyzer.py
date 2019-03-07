@@ -98,7 +98,8 @@ class isoTrackDeDxAnalyzer( Analyzer ):
 
     def declareHandles(self):
         super(isoTrackDeDxAnalyzer, self).declareHandles()
-        self.handles['dedx'] = AutoHandle("isolatedTracks","edm::Association<reco::DeDxHitInfoCollection>")            
+        self.handles['dedx'] = AutoHandle("isolatedTracks","edm::Association<reco::DeDxHitInfoCollection>")
+        self.handles['vertex'] = AutoHandle("offlineSlimmedPrimaryVertices","vector<reco::Vertex>")
 
     def beginLoop(self, setup):
         super(isoTrackDeDxAnalyzer,self).beginLoop(setup)
@@ -131,7 +132,26 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             getDeDxRef = fixed.get
         
         event.isoTracks = []
+				
+        getVertexRef = self.handles['vertex'].product()
         
+        vertex = None
+        
+        for v in getVertexRef:
+          if(v.isFake() == 0 and v.ndof() > 4 and abs(v.z()) <= 24 and v.position().rho() < 2):
+            vertex = v
+            break
+
+        if(vertex is None):
+          print("ERROR: no primary vertex passing all cuts was found for the event!")
+          event.vx = 999
+          event.vy = 999
+          event.vz = 999
+        else:
+          event.vx = vertex.x()
+          event.vy = vertex.y()
+          event.vz = vertex.z()
+				
         pixelChargeToEnergyCoefficient = 3.61e-6
         stripChargeToEnergyCoefficient = 3.61e-6 * 265
         
