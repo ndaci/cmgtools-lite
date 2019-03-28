@@ -2,6 +2,7 @@ import os.path
 from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 from PhysicsTools.Heppy.analyzers.core.AutoHandle import AutoHandle
 
+import ROOT
 from CMGTools.RootTools.utils.trackerTopologyHelper import loadTrackerTopology
 
 from PhysicsTools.HeppyCore.utils.deltar import deltaR, matchObjectCollection3
@@ -167,6 +168,8 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.closestTau  = closest(t, nearby(t, event.selectedTaus, 0.4))
 
             t.dedxByHit           = [0 for i in xrange(14)]
+            t.deByHit             = [0 for i in xrange(14)]
+            t.dxByHit             = [0 for i in xrange(14)]
             t.dedxUnSmearedByHit  = [0 for i in xrange(14)]    # unsmeared dedx. For MC the dedx is smeared according to data/mc discrepancy, but the unsmeared is kept for future use
             t.subDetIdByHit       = [0 for i in xrange(14)]
             t.pixByHit            = [0 for i in xrange(14)]    # 0 = strips, 1 = bpix, 2 = fpix
@@ -177,6 +180,7 @@ class isoTrackDeDxAnalyzer( Analyzer ):
             t.moduleByHit         = [0 for i in xrange(14)]
             t.sizeXbyHit          = [0 for i in xrange(14)]
             t.sizeYbyHit          = [0 for i in xrange(14)]
+
 
             # get dedx
             if self.cfg_ana.doDeDx:
@@ -198,6 +202,9 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                       t.dedxByHit[ih] = pixelCluster.charge()/dedx.pathlength(ih)
                       # convert number of electrons to MeV
                       t.dedxByHit[ih] *= pixelChargeToEnergyCoefficient
+
+                      t.deByHit[ih] = (pixelCluster.charge()*pixelChargeToEnergyCoefficient)
+                      t.dxByHit[ih] = dedx.pathlength(ih)
                       
                       t.sizeXbyHit[ih] = pixelCluster.sizeX()
                       t.sizeYbyHit[ih] = pixelCluster.sizeY()
@@ -220,6 +227,17 @@ class isoTrackDeDxAnalyzer( Analyzer ):
    
                       mysum += pixelCluster.charge()
 
+                      #
+                      #  https://github.com/cms-sw/cmssw/blob/master/DataFormats/TrackReco/interface/DeDxHitInfo.h
+                      #
+                      #  dEdX object DeDxHitInfoCollection
+                      #
+                      #
+                      #  https://github.com/cms-sw/cmssw/blob/master/DataFormats/SiPixelDetId/interface/PXBDetId.h
+                      #  https://github.com/cms-sw/cmssw/blob/master/DataFormats/SiPixelDetId/interface/PXFDetId.h
+                      #
+
+
                     # strips                      
                     if stripCluster:
                       t.dedxByHit[ih] = stripCluster.charge()/dedx.pathlength(ih)
@@ -227,6 +245,10 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                       t.dedxByHit[ih] *= stripChargeToEnergyCoefficient
                       #t.sizeXbyHit[ih] = stripCluster.sizeX() --> 'SiStripCluster' object has no attribute 'sizeX'
                       t.layerOrSideByHit[ih] = self.topology.layer(detid)
+
+                      t.deByHit[ih] = (stripCluster.charge()*stripChargeToEnergyCoefficient)
+                      t.dxByHit[ih] = dedx.pathlength(ih)
+
                     
                     t.subDetIdByHit[ih] = detid.subdetId()
 
@@ -244,10 +266,10 @@ class isoTrackDeDxAnalyzer( Analyzer ):
                           t.dedxByHit[ih] = scaleDedx( t.dedxByHit[ih], t.pixByHit[ih], t.layerOrSideByHit[ih], t.ladderOrBladeByHit[ih], abs(t.eta()), event.run )
 
 
+                    
                 t.myDeDx = mysum
             else:
                 t.myDeDx = 0
-
 
             # add a flag for bad ECAL channels in the way of the track
             t.channelsGoodECAL = 1

@@ -106,6 +106,40 @@ hitDeDxType = NTupleObjectType("hitDeDxType", baseObjectTypes = [], variables = 
     NTupleVariable("dedxUnSmearedByHit12", lambda x : x.dedxUnSmearedByHit[12]),
     NTupleVariable("dedxUnSmearedByHit13", lambda x : x.dedxUnSmearedByHit[13]),
     
+    #-------------------------------------------
+    
+    NTupleVariable("deByHit0", lambda x : x.deByHit[0]),
+    NTupleVariable("deByHit1", lambda x : x.deByHit[1]),
+    NTupleVariable("deByHit2", lambda x : x.deByHit[2]),
+    NTupleVariable("deByHit3", lambda x : x.deByHit[3]),
+    NTupleVariable("deByHit4", lambda x : x.deByHit[4]),
+    NTupleVariable("deByHit5", lambda x : x.deByHit[5]),
+    NTupleVariable("deByHit6", lambda x : x.deByHit[6]),
+    NTupleVariable("deByHit7", lambda x : x.deByHit[7]),
+    NTupleVariable("deByHit8", lambda x : x.deByHit[8]),
+    NTupleVariable("deByHit9", lambda x : x.deByHit[9]),
+    NTupleVariable("deByHit10", lambda x : x.deByHit[10]),
+    NTupleVariable("deByHit11", lambda x : x.deByHit[11]),
+    NTupleVariable("deByHit12", lambda x : x.deByHit[12]),
+    NTupleVariable("deByHit13", lambda x : x.deByHit[13]),
+
+    NTupleVariable("dxByHit0", lambda x : x.dxByHit[0]),
+    NTupleVariable("dxByHit1", lambda x : x.dxByHit[1]),
+    NTupleVariable("dxByHit2", lambda x : x.dxByHit[2]),
+    NTupleVariable("dxByHit3", lambda x : x.dxByHit[3]),
+    NTupleVariable("dxByHit4", lambda x : x.dxByHit[4]),
+    NTupleVariable("dxByHit5", lambda x : x.dxByHit[5]),
+    NTupleVariable("dxByHit6", lambda x : x.dxByHit[6]),
+    NTupleVariable("dxByHit7", lambda x : x.dxByHit[7]),
+    NTupleVariable("dxByHit8", lambda x : x.dxByHit[8]),
+    NTupleVariable("dxByHit9", lambda x : x.dxByHit[9]),
+    NTupleVariable("dxByHit10", lambda x : x.dxByHit[10]),
+    NTupleVariable("dxByHit11", lambda x : x.dxByHit[11]),
+    NTupleVariable("dxByHit12", lambda x : x.dxByHit[12]),
+    NTupleVariable("dxByHit13", lambda x : x.dxByHit[13]),
+
+    #-------------------------------------------
+
     NTupleVariable("subDetIdByHit0", lambda x : x.subDetIdByHit[0], int),
     NTupleVariable("subDetIdByHit1", lambda x : x.subDetIdByHit[1], int),
     NTupleVariable("subDetIdByHit2", lambda x : x.subDetIdByHit[2], int),
@@ -278,7 +312,6 @@ isoTrackTypeDeDx = NTupleObjectType("isoTrackTypeDeDx", baseObjectTypes = [ part
     NTupleVariable("trigLepton_idx", lambda x : x.trigLepton.index if getattr(x, 'trigLepton', None) else -1, int),
 
     NTupleVariable("myDeDx", lambda x : x.myDeDx),
-                                                                                                         
     NTupleVariable("mcMatch", lambda x : x.mcMatch.index if x.mcMatch else -1, int, mcOnly=True),
     NTupleVariable("mcMatchAnyId", lambda x : x.mcMatchAny.pdgId()*(1+99*x.mcMatchAny.isDirectPromptTauDecayProductFinalState()) if x.mcMatchAny else 0, int, mcOnly=True, help="MC pdgId of the matched gen lepton, tau, photon or chargino (for leptons from tau, it's pdgId*100)"),
     NTupleVariable("mcMatchAnyPt", lambda x : x.mcMatchAny.pt() if x.mcMatchAny else 0, int, mcOnly=True, help="MC pt of the matched gen lepton, tau, photon or chargino"),
@@ -319,7 +352,10 @@ treeProducer = cfg.Analyzer(
     globalVariables = [
         NTupleVariable("rho",  lambda ev: ev.rho, float, help="kt6PFJets rho"),
         NTupleVariable("nVert",  lambda ev: len(ev.goodVertices), int, help="Number of good vertices"),
-
+        NTupleVariable("vertex_x",  lambda ev: ev.vx, float, help="Primary vertex x"),
+        NTupleVariable("vertex_y",  lambda ev: ev.vy, float, help="Primary vertex y"),
+        NTupleVariable("vertex_z",  lambda ev: ev.vz, float, help="Primary vertex z"),
+        
         NTupleVariable("nJet30", lambda ev: sum([j.pt() > 30 for j in ev.cleanJets]), int, help="Number of jets with pt > 30, |eta|<2.4"),
         NTupleVariable("nJet30a", lambda ev: sum([j.pt() > 30 for j in ev.cleanJetsAll]), int, help="Number of jets with pt > 30, |eta|<4.7"),
 

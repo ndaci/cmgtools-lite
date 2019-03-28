@@ -36,7 +36,12 @@ Wino_M_500_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_500_cTau_10", "Wino_
 Wino_M_650_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_650_cTau_10", "Wino_M_650_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
 Wino_M_800_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_800_cTau_10", "Wino_M_800_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
 Wino_M_1000_cTau_10 = kreator.makeMCComponentFromEOS("Wino_M_1000_cTau_10", "Wino_M_1000_cTau_10", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
-Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_500_cTau_10, Wino_M_650_cTau_10, Wino_M_800_cTau_10, Wino_M_1000_cTau_10 ]
+Wino_M_500_cTau_20 = kreator.makeMCComponentFromEOS("Wino_M_500_cTau_20", "Wino_M_500_cTau_20", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_650_cTau_20 = kreator.makeMCComponentFromEOS("Wino_M_650_cTau_20", "Wino_M_650_cTau_20", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_800_cTau_20 = kreator.makeMCComponentFromEOS("Wino_M_800_cTau_20", "Wino_M_800_cTau_20", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+Wino_M_1000_cTau_20 = kreator.makeMCComponentFromEOS("Wino_M_1000_cTau_20", "Wino_M_1000_cTau_20", "/store/cmst3/user/gpetrucc/SusyWithDeDx/%s.merged", ".*root", 1)
+
+Winos = [ Wino_M_300_cTau_3  , Wino_M_300_cTau_10 , Wino_M_300_cTau_30 , Wino_M_500_cTau_10, Wino_M_650_cTau_10, Wino_M_800_cTau_10, Wino_M_1000_cTau_10, Wino_M_500_cTau_20, Wino_M_650_cTau_20, Wino_M_800_cTau_20, Wino_M_1000_cTau_20 ]
 
 Top = [ TTLep, TTHad, TTSemi] + Ts
 VV  = [ WW, WZ, ZZ ]
@@ -47,17 +52,30 @@ Zll = [
     DYJetsM50_HT400to600,     DYJetsM50_HT400to600e,
     DYJetsM50_HT600to800,
     DYJetsM50_HT800to1200,
-    DYJetsM50_HT1200to2500,
-    DYJetsM50_HT2500toInf,
+    #DYJetsM50_HT1200to2500,
+    #DYJetsM50_HT2500toInf,
 ]
 
+SelectedSamples = [
+    #QCD_HT100to200,
+    #TTSemi,
+    #TBar_tch,
+    WJets_HT100to200,
+    WJets_HT600to800,
+    ZvvJets_HT600to800,
+]
+
+
 if region == "sr":   
-    mcSamples =  ( QCD
+    mcSamples =  ( 
+      #SelectedSamples
+                   QCD
                  + Ws
                  + Zvv
                  + Zll 
                  + VV
-                 + Top)
+                 + Top
+                 )
     mcSignals = Winos
     mcTriggers = triggers_SOS_highMET[:] 
 elif region == "cr1l": 
@@ -163,6 +181,16 @@ elif test == "1D":
     isoTrackDeDxAna.doDeDx = True
     isoTrackDeDxAna.doCalibrateScaleDeDx = True
     comp.triggers = []
+elif test == "1E": 
+    comp = dataSamples[0]
+    #comp.files = [ ': /store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v2/90000/FB3B40F9-0C73-C144-BB08-8E2DFB7AD448.root ' ]
+    comp.files = [ '/tmp/amassiro/FB3B40F9-0C73-C144-BB08-8E2DFB7AD448.root' ]
+    selectedComponents = doTest1(comp, sequence=sequence, cache=False )
+    print "The test wil use file %s " % comp.files[0]
+    fastJetSkim.minJets = 0
+    isoTrackDeDxAna.doDeDx = True
+    isoTrackDeDxAna.doCalibrateScaleDeDx = True
+    comp.triggers = [] 
 elif test == "1A":
     comp = dataSamples[0]
     comp.name = "AOD"
