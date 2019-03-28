@@ -61,11 +61,13 @@ if region == "sr":
     mcSignals = Winos
     mcTriggers = triggers_SOS_highMET[:] 
 elif region == "cr1l": 
-    mcSamples =  ( QCD
-                 + Ws
-                 + Zll 
-                 + VV
-                 + Top)
+    mcSamples =  (
+                   #QCD
+                 #+ Ws
+                 Zll 
+                 #+ VV
+                 #+ Top
+                 )
     mcTriggers = triggers_1mu_iso + triggers_1e_iso + triggers_1e_noniso
     mcSignals = []
 
@@ -79,8 +81,9 @@ from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
 if region == "sr":   
     datasetsAndTriggers = [ ("MET", triggers_SOS_highMET) ]
 elif region == "cr1l":   
-    datasetsAndTriggers = [ ("SingleMuon", triggers_1mu_iso),
-                            ("SingleElectron", triggers_1e_iso + triggers_1e_noniso) ]
+    datasetsAndTriggers = [ ("SingleMuon", triggers_1mu_iso) #,
+                            #("SingleElectron", triggers_1e_iso + triggers_1e_noniso)
+                          ]
 
 json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt'
 dataSamples = []; vetoTriggers = []
@@ -98,8 +101,18 @@ if run == "all":    selectedComponents = mcSamples + dataSamples + mcSignals
 elif run == "data": selectedComponents = dataSamples
 elif run == "mc":   selectedComponents = mcSamples
 elif run == "sig":  selectedComponents = mcSignals
+elif run == "aod":
+    from CMGTools.RootTools.samples.samples_13TeV_DATA2017_AOD import dataSamples_17Nov2017_AOD
+    selectedComponents = [ d for d in dataSamples_17Nov2017_AOD 
+                           if "DoubleMuon" in d.name or "ZeroBias" in d.name ]
 
 if run == "sig" or run == "mc" : isoTrackDeDxAna.doDeDx = True
+
+# apply de/dx calibration if run on data
+if run == "data" :
+    isoTrackDeDxAna.doCalibrateScaleDeDx = True
+
+
 
 if run == "data":
     for c in  selectedComponents:
@@ -109,9 +122,15 @@ if run == "mc":
     for c in  selectedComponents:
        c.splitFactor = len(c.files)/2
 
+if run == "aod":
+    prescaleComponents(selectedComponents, int(getHeppyOption("prescale","1")))
+    configureSplittingFromTime(selectedComponents, 50, 2.5, maxFiles=4)
 
 #-------- SEQUENCE -----------
 sequence = cfg.Sequence( xtracks_sequence )
+if run == "aod":
+    sequence = cfg.Sequence( xtracks_sequence_AOD )
+
 
 #-------- HOW TO RUN -----------
 test = getHeppyOption('test')
@@ -134,6 +153,24 @@ elif test == "1S":
     fastJetSkim.minJets = 0
     isoTrackDeDxAna.doDeDx = True
     comp.triggers = []
+elif test == "1D":
+    comp = dataSamples[0]
+    #comp.files = [ ': /store/data/Run2017D/DoubleEG/MINIAOD/31Mar2018-v1/00000/C0914411-F636-E811-8796-44A84225D36F.root ' ]
+    comp.files = [ '/tmp/amassiro/test3.root ' ]
+    selectedComponents = doTest1(comp, sequence=sequence, cache=False )
+    print "The test wil use file %s " % comp.files[0]
+    fastJetSkim.minJets = 0
+    isoTrackDeDxAna.doDeDx = True
+    isoTrackDeDxAna.doCalibrateScaleDeDx = True
+    comp.triggers = []
+elif test == "1A":
+    comp = dataSamples[0]
+    comp.name = "AOD"
+    comp.files = [ '/eos/cms/store/cmst3/user/gpetrucc/Run2017D_ZeroBias_17Nov2017_AOD.root' ]
+    comp.triggers = []
+    sequence = cfg.Sequence( xtracks_sequence_AOD )
+    selectedComponents = doTest1(comp, sequence=sequence, cache=False )
+    print "The test wil use file %s " % comp.files[0]
 elif test in ('2','3','5s'):
     doTestN(test,selectedComponents)
 

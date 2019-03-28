@@ -19,3 +19,10 @@ IsoTrack_pt : IsoTrack_pt : 20,0,500 ; XTitle="track p_{T} (GeV)"
 IsoTrack_eta : IsoTrack_eta : 20,-2.4,2.4 ; XTitle="track #eta  (GeV)"
 
 IsoTrack_relIso03 : (IsoTrack_dR03IsoCH + max(0, IsoTrack_dR03IsoNH+IsoTrack_dR03IsoPH-0.5*IsoTrack_dR03IsoPU))/IsoTrack_pt : 20,0,0.5 ; XTitle="track relIso(R 0.3)"
+
+## For Zmm
+zmm_metNoMu:  metNoMu_pt: 20,200,1200 ; XTitle="E_{T}^{miss} (no #mu) [GeV]", Logy
+zmm_mass : mass_2(LepGood_pt[0],LepGood_eta[0],LepGood_phi[0],LepGood_mass[0],LepGood_pt[1],LepGood_eta[1],LepGood_phi[1],LepGood_mass[1]) : 40,60,120 ; XTitle="m(#mu#mu) [GeV]"
+
+## DeDx NN (4 hits)
+IsoTrack_dedxNN4h : IsoTrack_dedxNN4h : 10,0,1 ; XTitle="dE/dx NN (4-hit version)"

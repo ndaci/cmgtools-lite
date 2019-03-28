@@ -1,16 +1,15 @@
 # vim: syntax=sh
 * ; TreeName="treeProducerXtracks"
 
-# we only take MC-matched tracks in the signal
-wino_m1000_ct10+ : Wino_M_1000_cTau_10 : xsec : IsoTrack_mcMatch != -1 ;  FillColor=ROOT.kViolet+1, Label="\#chi^{\#pm} (1T\, c\#tau 10)"
+#wino_m300_ct10+ : Wino_M_300_cTau_10 : xsec : 1 ;  FillColor=ROOT.kYellow; Label="\#chi^{\#pm} (300\, c\#tau 10)"
 
-zvv : ZvvJets_HT100to200 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
-zvv : ZvvJets_HT200to400 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
-zvv : ZvvJets_HT400to600 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
-zvv : ZvvJets_HT600to800 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
-zvv : ZvvJets_HT800to1200 : xsec : 1 ;           FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
-zvv : ZvvJets_HT1200to2500 : xsec : 1 ;          FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
-zvv : ZvvJets_HT2500toInf : xsec : 1 ;           FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu)"
+zvv : ZvvJets_HT100to200 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
+zvv : ZvvJets_HT200to400 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
+zvv : ZvvJets_HT400to600 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
+zvv : ZvvJets_HT600to800 : xsec : 1 ;            FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
+zvv : ZvvJets_HT800to1200 : xsec : 1 ;           FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
+zvv : ZvvJets_HT1200to2500 : xsec : 1 ;          FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
+zvv : ZvvJets_HT2500toInf : xsec : 1 ;           FillColor=ROOT.kGreen+1, Label="Z(\#nu\#nu) from MC"
 wlv : WJets_HT100to200 : xsec : 1 ;              FillColor=ROOT.kRed    , Label="W(l\#nu)"
 wlv : WJets_HT200to400 : xsec : 1 ;              FillColor=ROOT.kRed    , Label="W(l\#nu)"
 wlv : WJets_HT400to600 : xsec : 1 ;              FillColor=ROOT.kRed    , Label="W(l\#nu)"     
@@ -18,6 +17,7 @@ wlv : WJets_HT600to800 : xsec : 1 ;              FillColor=ROOT.kRed    , Label=
 wlv : WJets_HT800to1200 : xsec : 1 ;             FillColor=ROOT.kRed    , Label="W(l\#nu)"     
 wlv : WJets_HT1200to2500 : xsec : 1 ;            FillColor=ROOT.kRed    , Label="W(l\#nu)"     
 wlv : WJets_HT2500toInf : xsec : 1 ;             FillColor=ROOT.kRed    , Label="W(l\#nu)"     
+
 zll : DYJetsM50_HT100to200 : xsec : 1 ;          FillColor=ROOT.kCyan+1,  Label="Z(ll)"  
 zll : DYJetsM50_HT200to400 : xsec : 1 ;          FillColor=ROOT.kCyan+1,  Label="Z(ll)"  
 zll : DYJetsM50_HT400to600 : xsec : 1 ;          FillColor=ROOT.kCyan+1,  Label="Z(ll)"  
@@ -25,6 +25,17 @@ zll : DYJetsM50_HT600to800 : xsec : 1 ;          FillColor=ROOT.kCyan+1,  Label=
 zll : DYJetsM50_HT800to1200 : xsec : 1 ;         FillColor=ROOT.kCyan+1,  Label="Z(ll)"  
 zll : DYJetsM50_HT1200to2500 : xsec : 1 ;        FillColor=ROOT.kCyan+1,  Label="Z(ll)"  
 zll : DYJetsM50_HT2500toInf : xsec : 1 ;         FillColor=ROOT.kCyan+1,  Label="Z(ll)"  
+
+zvv_fromzmm : DYJetsM50_HT100to200 : xsec : 1 ;          FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"
+zvv_fromzmm : DYJetsM50_HT200to400 : xsec : 1 ;          FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"  
+zvv_fromzmm : DYJetsM50_HT400to600 : xsec : 1 ;          FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"  
+zvv_fromzmm : DYJetsM50_HT600to800 : xsec : 1 ;          FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"  
+zvv_fromzmm : DYJetsM50_HT800to1200 : xsec : 1 ;         FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"  
+zvv_fromzmm : DYJetsM50_HT1200to2500 : xsec : 1 ;        FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"  
+zvv_fromzmm : DYJetsM50_HT2500toInf : xsec : 1 ;         FillColor=ROOT.kGreen+3,  Label="Z(\#nu\#nu) from Zll", FakeRate="xtracks/fakerate-ZvvFromZll.txt"  
+
+
+
 top : TTHad : xsec : 1 ;                         FillColor=ROOT.kOrange+1,  Label="Top"
 top : TTSemi : xsec : 1 ;                        FillColor=ROOT.kOrange+1,  Label="Top"
 top : TTLep : xsec : 1 ;                         FillColor=ROOT.kOrange+1,  Label="Top"
