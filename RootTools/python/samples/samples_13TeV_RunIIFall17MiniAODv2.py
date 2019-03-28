@@ -39,7 +39,7 @@ Ws = [
     WJets_HT600to800,
     WJets_HT800to1200,
     WJets_HT1200to2500,
-    WJets_HT2500toInf,
+    #WJets_HT2500toInf,
 ]
 
 # DY + Jets
@@ -82,9 +82,9 @@ Zvv = [
     ZvvJets_HT200to400,
     ZvvJets_HT400to600,
     ZvvJets_HT600to800,
-    ZvvJets_HT800to1200,
-    ZvvJets_HT1200to2500,
-    ZvvJets_HT2500toInf
+    ZvvJets_HT800to1200
+    #ZvvJets_HT1200to2500,
+    #ZvvJets_HT2500toInf
 ]
 
 # TT
