@@ -133,7 +133,7 @@ Zvv = [
     ZvvJets_HT200to400,
 # FIXME MISSING SAMPLE           ZvvJets_HT400to600,
     ZvvJets_HT600to800,
-    ZvvJets_HT800to1200
+    ZvvJets_HT800to1200,
     ZvvJets_HT1200to2500,
     ZvvJets_HT2500toInf
 ]
