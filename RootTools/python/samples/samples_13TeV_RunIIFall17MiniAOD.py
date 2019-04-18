@@ -285,6 +285,26 @@ DYJetsToLLM50HT = [
 
 DYs = DYJets + DYNJetsToLL + DYJetsToLLM4to50HT + DYJetsToLLM50HT
 
+# ====== Z(vv) + Jets LO HT-binned ======
+# Cross sections from (w/o k-factors) : https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#DY_Z
+
+ZvvJets_HT100to200      = kreator.makeMCComponent("ZvvJets_HT100to200",      "/ZJetsToNuNu_HT-100To200_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",    "CMS", ".*root", 280.35  )
+ZvvJets_HT200to400      = kreator.makeMCComponent("ZvvJets_HT200to400",      "/ZJetsToNuNu_HT-200To400_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",    "CMS", ".*root", 77.67   )
+ZvvJets_HT400to600      = kreator.makeMCComponent("ZvvJets_HT400to600",      "/ZJetsToNuNu_HT-400To600_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",    "CMS", ".*root", 10.73   )
+ZvvJets_HT600to800      = kreator.makeMCComponent("ZvvJets_HT600to800",      "/ZJetsToNuNu_HT-600To800_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",    "CMS", ".*root", 2.559   )
+ZvvJets_HT800to1200     = kreator.makeMCComponent("ZvvJets_HT800to1200",     "/ZJetsToNuNu_HT-800To1200_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",   "CMS", ".*root", 1.1796  )
+ZvvJets_HT1200to2500    = kreator.makeMCComponent("ZvvJets_HT1200to2500",    "/ZJetsToNuNu_HT-1200To2500_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",  "CMS", ".*root", 0.28833 )
+ZvvJets_HT2500toInf     = kreator.makeMCComponent("ZvvJets_HT2500toInf",     "/ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM",   "CMS", ".*root", 0.006945)
+
+ZvvLOHT = [
+    ZvvJets_HT100to200,
+    ZvvJets_HT200to400,
+    ZvvJets_HT400to600,
+    ZvvJets_HT600to800,
+    ZvvJets_HT800to1200,
+    ZvvJets_HT1200to2500,
+    ZvvJets_HT2500toInf
+]
 
 # VJetsQQ HT-binned
 WJetsToQQ_HT400to600 = kreator.makeMCComponent("WJetsToQQ_HT400to600", "/WJetsToQQ_HT400to600_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAOD-94X_mc2017_realistic_v10-v1/MINIAODSIM", "CMS", ".*root", 1452.)

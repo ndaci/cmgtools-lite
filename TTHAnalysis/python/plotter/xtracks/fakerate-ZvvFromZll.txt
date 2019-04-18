@@ -1,0 +1,10 @@
+# change these everywhere
+change : met_pt : metNoMu_pt
+change : met_phi : metNoMu_phi
+change : nLepGood : (nLepGood-2)
+
+# weight
+weight : weight_ZvvFromZll(metNoMu_pt)
+
+# additional cuts (must be at the end)
+cut-file: xtracks/fakerate-ZvvFromZll-cuts.txt

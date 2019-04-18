@@ -1,0 +1,7 @@
+MuMu: LepGood_pdgId[0]*LepGood_pdgId[1] == -169 
+ZPeak: abs(mass_2(LepGood_pt[0],LepGood_eta[0],LepGood_phi[0],LepGood_mass[0],LepGood_pt[1],LepGood_eta[1],LepGood_phi[1],LepGood_mass[1])-90) < 30
+
+DrLepTrack: deltaR(LepGood_eta[0],LepGood_phi[0],IsoTrack_eta,IsoTrack_phi) > 0.4 && deltaR(LepGood_eta[1],LepGood_phi[1],IsoTrack_eta,IsoTrack_phi) > 0.4
+DrLepLeadJet: deltaR(LepGood_eta[0],LepGood_phi[0],Jet_eta[0],Jet_phi[0]) > 0.4 
+
+MuonID: (LepGood_pt[0] > 20 && LepGood_tightId[0] && LepGood_relIso04[0] < 0.15) || (LepGood_pt[1] > 20 && LepGood_tightId[1] && LepGood_relIso04[1] < 0.15)
