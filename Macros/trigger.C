@@ -56,28 +56,45 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
   vector<TString> dirDS[ nDS]; 
   // fullPath = baseDir + subDir + dirDS[iS][iDS] + suffixDir;
 
+  // 2018 Samples
   if(era=="2018") {
+
     baseDir    = "/eos/cms/store/group/phys_exotica/xtracks/";
-    subDirData = "1Apr2019-Hadded-2018/";
-    subDirMC   = "1Apr2019-Hadded-2018/";
+    subDirData = "/1Apr2019-Hadded-2018/";
+    subDirMC   = "";
     suffixDir  = "/treeProducerXtracks/tree.root";
 
     dirDS[0] = {"SingleMuon_Run2018A", "SingleMuon_Run2018B", "SingleMuon_Run2018C"};
-    dirDS[1] = {};
-    //dirDS[2] = {"DYJetsM50_HT100to200", "DYJetsM50_HT200to400", "DYJetsM50_HT400to600", 
-    //            "DYJetsM50_HT600to800", "DYJetsM50_HT800to1200"};
-    dirDS[2] = {"DYJetsM50_HT400to600", "DYJetsM50_HT800to1200"};
+
+    dirDS[1] = { "23April2019_Samples2018_Hadded/WJets_HT100to200/",
+		 "23April2019_Samples2018_Hadded/WJets_HT200to400/",
+		 "23April2019_Samples2018_Hadded/WJets_HT400to600/",
+		 "23April2019_Samples2018_Hadded/WJets_HT600to800/",
+		 "23April2019_Samples2018_Hadded/WJets_HT800to1200/",
+		 "23April2019_Samples2018_Hadded/WJets_HT1200to2500/",
+		 "23April2019_Samples2018_Hadded/WJets_HT2500toInf/" };
+
+    dirDS[2] = { "23April2019_Samples2018_Hadded/DYJetsM50_HT100to200/",
+		 "23April2019_Samples2018_Hadded/DYJetsM50_HT200to400/",
+		 "1Apr2019-Hadded-2018/DYJetsM50_HT400to600/", 
+		 "23April2019_Samples2018_Hadded/DYJetsM50_HT600to800/",
+		 "1Apr2019-Hadded-2018/DYJetsM50_HT800to1200/" };
   }
 
+  // 2017 Samples
   else if(era=="2017") {
-    baseDir    = "/eos/cms/store/cmst3/user/amassiro/CMG/";
-    subDirData = "Data-CR1L-NewGeometry-Calibrated-and-Smeared-Correct/";
-    subDirMC   = "MC-CR1L-NewGeometry-Calibrated-and-Smeared-Correct/";
+
+    baseDir    = "/eos/cms/store/"; 
+    subDirData = "/cmst3/user/amassiro/CMG/Data-CR1L-NewGeometry-Calibrated-and-Smeared-Correct/";
+    subDirMC   = "";
     suffixDir  = "";
 
     dirDS[0] = {"tree_SingleMuon_*.root"};
-    dirDS[1] = {""};
-    dirDS[2] = {"tree_DY*.root"};
+
+    dirDS[1] = {"/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT100to200/treeProducerXtracks/tree.root"};
+
+    dirDS[2] = {"/cmst3/user/amassiro/CMG/MC-CR1L-NewGeometry-Calibrated-and-Smeared-Correct/tree_DY*.root"};
+
   }
 
   else {
@@ -139,8 +156,10 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 	if(mcDS[iS]) subDir = subDirMC;
 	else         subDir = subDirData;
 	fullPath = baseDir + subDir + dirDS[iS][iDS] + suffixDir;
+	cout << "--- add file: " << fullPath << endl;
 	chain[iS]->Add(fullPath);
       }
+      cout << endl;
 
       processChain(nEvents, chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], doCutOnMetFlags, doPrintBeforeCuts);
       fout->cd();
