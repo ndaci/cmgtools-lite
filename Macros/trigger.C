@@ -35,7 +35,8 @@ Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC, T
 
 // MAIN //
 Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE, 
-	   TString era="2018"          , Int_t nEvents=-1, 
+	   TString era="2018"          , TString sample="all",
+	   Int_t nEvents=-1, 
 	   Bool_t doCutOnMetFlags=kTRUE, Bool_t doPrintBeforeCuts=kTRUE,
 	   Bool_t doConstantBinning=kFALSE)
 {
@@ -127,6 +128,8 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
   // Process Data Sets //
   if(doReadChains) {
     for(UInt_t iS=0; iS<nDS; iS++) {
+
+      if(nameDS[iS]!=sample && sample!="all") continue;
 
       cout << endl << "-- Processing sample: " 
 	   << nameDS[iS] << " " << titleDS[iS] << " --" << endl;
