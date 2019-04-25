@@ -91,7 +91,7 @@ Zvv = [
 TTJets = kreator.makeMCComponent("TTJets", "/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"              , "CMS", ".*root", 831.76, fracNegWeights=0.319   )
 TTLep  = kreator.makeMCComponent("TTLep" , "/TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"       , "CMS", ".*root", 831.76*((3*0.108)**2)          )
 TTHad  = kreator.makeMCComponent("TTHad" , "/TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM"    , "CMS", ".*root", 831.76*((1-3*0.108)**2)        )
-TTSemi = kreator.makeMCComponent("TTSemi", "/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM", "CMS", ".*root", 831.76*2*(3*0.108)*(1-3*0.108) )
+TTSemi = kreator.makeMCComponent("TTSemi", "/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/MINIAODSIM", "CMS", ".*root", 831.76*2*(3*0.108)*(1-3*0.108) )
 
 TT = [ TTJets, TTLep, TTHad, TTSemi]
 
