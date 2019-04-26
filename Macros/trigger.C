@@ -106,7 +106,7 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
   TString plotDir = "plots/trigger/";
   TString fmode = "read";
   if(doReadChains) fmode = "recreate";
-  TFile *fout = new TFile(plotDir + "/" + version + "/histos_"+era+".root", fmode);
+  TFile *fout = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root", fmode);
   fout->cd();
 
   // Define Histograms //
@@ -343,19 +343,31 @@ Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC,
   Int_t           nVert;
   //
   // Trigger
+  Int_t           HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60_v;
+  Int_t           HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v;
+  Int_t           HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v;
+  Int_t           HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v;
+  Int_t           HLT_BIT_HLT_IsoMu24_v;
+  Int_t           HLT_BIT_HLT_IsoMu24_eta2p1_v;
+  Int_t           HLT_BIT_HLT_IsoMu27_v;
+  Int_t           HLT_BIT_HLT_Ele32_WPTight_Gsf_v;
+  Int_t           HLT_BIT_HLT_Ele35_WPTight_Gsf_v;
+  Int_t           HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v;
+  //
   Int_t           HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60;
   Int_t           HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60;
   Int_t           HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight;
   Int_t           HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight;
-  Int_t           HLT_MET;
-  Int_t           HLT_BIT_HLT_IsoMu24_v;
-  Int_t           HLT_BIT_HLT_IsoMu24_eta2p1_v;
-  Int_t           HLT_BIT_HLT_IsoMu27_v;
-  Int_t           HLT_SingleMu;
-  Int_t           HLT_BIT_HLT_Ele32_WPTight_Gsf_v;
-  Int_t           HLT_BIT_HLT_Ele35_WPTight_Gsf_v;
-  Int_t           HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v;
+  Int_t           HLT_BIT_HLT_IsoMu24;
+  Int_t           HLT_BIT_HLT_IsoMu24_eta2p1;
+  Int_t           HLT_BIT_HLT_IsoMu27;
+  Int_t           HLT_BIT_HLT_Ele32_WPTight_Gsf;
+  Int_t           HLT_BIT_HLT_Ele35_WPTight_Gsf;
+  Int_t           HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT;
+  //
   Int_t           HLT_SingleEl;
+  Int_t           HLT_MET;
+  Int_t           HLT_SingleMu;
   //
   // MET Noise Filters
   Int_t           Flag_goodVertices;
@@ -498,18 +510,30 @@ Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC,
   }
 
   //
-  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60", &HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60); // , &b_HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60);
-  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60", &HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60); // , &b_HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60);
-  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight", &HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight); // , &b_HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight);
-  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight", &HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight); // , &b_HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight);
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60_v", &HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v", &HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v", &HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v", &HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu24_v", &HLT_BIT_HLT_IsoMu24_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu24_eta2p1_v", &HLT_BIT_HLT_IsoMu24_eta2p1_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu27_v", &HLT_BIT_HLT_IsoMu27_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_Ele32_WPTight_Gsf_v", &HLT_BIT_HLT_Ele32_WPTight_Gsf_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_Ele35_WPTight_Gsf_v", &HLT_BIT_HLT_Ele35_WPTight_Gsf_v); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v", &HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v); 
+  //
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60", &HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60", &HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight", &HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight", &HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu24", &HLT_BIT_HLT_IsoMu24); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu24_eta2p1", &HLT_BIT_HLT_IsoMu24_eta2p1); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu27", &HLT_BIT_HLT_IsoMu27); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_Ele32_WPTight_Gsf", &HLT_BIT_HLT_Ele32_WPTight_Gsf); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_Ele35_WPTight_Gsf", &HLT_BIT_HLT_Ele35_WPTight_Gsf); 
+  fChain->SetBranchAddress("HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT", &HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT); 
+  //
   fChain->SetBranchAddress("HLT_MET", &HLT_MET); // , &b_HLT_MET);
-  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu24_v", &HLT_BIT_HLT_IsoMu24_v); // , &b_HLT_BIT_HLT_IsoMu24_v);
-  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu24_eta2p1_v", &HLT_BIT_HLT_IsoMu24_eta2p1_v); // , &b_HLT_BIT_HLT_IsoMu24_eta2p1_v);
-  fChain->SetBranchAddress("HLT_BIT_HLT_IsoMu27_v", &HLT_BIT_HLT_IsoMu27_v); // , &b_HLT_BIT_HLT_IsoMu27_v);
   fChain->SetBranchAddress("HLT_SingleMu", &HLT_SingleMu); // , &b_HLT_SingleMu);
-  fChain->SetBranchAddress("HLT_BIT_HLT_Ele32_WPTight_Gsf_v", &HLT_BIT_HLT_Ele32_WPTight_Gsf_v); // , &b_HLT_BIT_HLT_Ele32_WPTight_Gsf_v);
-  fChain->SetBranchAddress("HLT_BIT_HLT_Ele35_WPTight_Gsf_v", &HLT_BIT_HLT_Ele35_WPTight_Gsf_v); // , &b_HLT_BIT_HLT_Ele35_WPTight_Gsf_v);
-  fChain->SetBranchAddress("HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v", &HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v); // , &b_HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v);
   fChain->SetBranchAddress("HLT_SingleEl", &HLT_SingleEl); // , &b_HLT_SingleEl);
   //
   fChain->SetBranchAddress("Flag_goodVertices", &Flag_goodVertices); // , &b_Flag_goodVertices);
@@ -659,7 +683,31 @@ Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC,
 
   cout << "- About to process: " << nToProcess << " entries." << endl;
   for(UInt_t iE=0; iE<nToProcess; iE++) {
-    
+
+    // Initialize HLT bit variables
+    HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60_v = 0 ;
+    HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v = 0 ;
+    HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v = 0 ;
+    HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight_v = 0 ;
+    HLT_BIT_HLT_IsoMu24_v = 0 ;
+    HLT_BIT_HLT_IsoMu24_eta2p1_v = 0 ;
+    HLT_BIT_HLT_IsoMu27_v = 0 ;
+    HLT_BIT_HLT_Ele32_WPTight_Gsf_v = 0 ;
+    HLT_BIT_HLT_Ele35_WPTight_Gsf_v = 0 ;
+    HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT_v = 0 ;
+    //
+    HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60 = 0 ;
+    HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 = 0 ;
+    HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight = 0 ;
+    HLT_BIT_HLT_PFMETNoMu140_PFMHTNoMu140_IDTight = 0 ;
+    HLT_BIT_HLT_IsoMu24 = 0 ;
+    HLT_BIT_HLT_IsoMu24_eta2p1 = 0 ;
+    HLT_BIT_HLT_IsoMu27 = 0 ;
+    HLT_BIT_HLT_Ele32_WPTight_Gsf = 0 ;
+    HLT_BIT_HLT_Ele35_WPTight_Gsf = 0 ;
+    HLT_BIT_HLT_Ele115_CaloIdVT_GsfTrkIdT = 0 ;
+
+    // Get entry #iE    
     fChain->GetEntry(iE);
     if(iE%10000==0) {
       cout << "-- Processing entry #" << iE << " / " << nEntries << endl;
@@ -919,7 +967,7 @@ Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC,
 
     // 5- Fill Histograms for trigger efficiencies
     hDen->Fill(metNoMu_pt);
-    if(HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight) 
+    if(HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight || HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v) 
       hNum->Fill(metNoMu_pt);
 
   } // end loop: entries
