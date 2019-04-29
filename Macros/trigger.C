@@ -26,7 +26,7 @@ typedef map< UInt_t , vector<ULong64_t> > MapLumiEvent;
 
 
 // Declare functions //
-Int_t plotEfficiency(TString plotDir, TString version, TString era, TString sample, const UInt_t nDS, 
+Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS);
 
 Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC, TH1F* hDen, TH1F* hNum, 
@@ -111,22 +111,25 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
   TString plotDir = "plots/trigger/";
   TString fmode = "read";
   if(doReadChains) fmode = "recreate";
-  TFile *fout;
+  TFile *fout = 0;
 
   // Define Histograms //
   TH1F*   hDen[ nDS];
   TH1F*   hNum[ nDS];
   //TEfficiency* teff[nDS];
 
-  const UInt_t nBinsMet = 25;
-  Float_t bins_met[nBinsMet]  = {  50,   75,  100,   110,  120, 
-				   130,  140,  150,  160,  170, 
-				   180,  190,  200,  220,  250, 
-				   300,  350,  400,  500,  650, 
-				   800, 1000, 1300, 1600, 2000};
+  const UInt_t nBinsMet = 26;
+  Float_t bins_met[nBinsMet]  = { 050,  075,  100,  110,  120, 
+				  130,  140,  150,  160,  170, 
+				  180,  190,  200,  220,  245, 
+				  255,  275,  300,  350,  400,  
+				  500,  650,  800, 1000, 1300, 
+				  2000};
 
   if(doReadChains) {
     for(UInt_t iS=0; iS<nDS; iS++) {
+
+      if(nameDS[iS]!=sample && sample!="all") continue;
 
       // Define output root file to store histograms
       fout = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root", fmode);
@@ -150,8 +153,6 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
       hNum[iS]->SetXTitle("PFMET NoMu (GeV)");
 
       // Process Data Sets //
-      if(nameDS[iS]!=sample && sample!="all") continue;
-
       cout << endl << "-- Processing sample: " 
 	   << nameDS[iS] << " " << titleDS[iS] << " --" << endl;
     
@@ -185,12 +186,12 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 
     if( !fout->IsZombie() ) fout->Write();
     if( !fout->IsZombie() ) fout->Close();
-    delete fout;
+    if(fout) delete fout;
   }
 
   // Plot efficiencies
   else {
-    plotEfficiency(plotDir, version, era, sample, nDS, nameDS, titleDS, colorDS, styleDS);
+    plotEfficiency(plotDir, version, era, nDS, nameDS, titleDS, colorDS, styleDS);
   }
 
   // END //
@@ -198,19 +199,20 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 }
 
 
-Int_t plotEfficiency(TString plotDir, TString version, TString era, TString sample, const UInt_t nDS, 
+Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS)
 {
 
   // Open histogram file
-  TFile* fread = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root" , "read");
-  TH1F*  hDen[nDS];
-  TH1F*  hNum[nDS];
+  TFile*  fread[nDS];
+  TString fpath[nDS];
+  TH1F*   hDen[nDS];
+  TH1F*   hNum[nDS];
   TEfficiency* teff[nDS];
   TString hTitle, theTitle, theAxes;
 
   // Prepare ratio plot
-  TH1F* hRatio[nDS-1];  
+  TH1F* hRatio[nDS];  
 
   // Prepare canvas //
   TCanvas* c  = new TCanvas("c" , "c" , 100, 100, 600, 600);
@@ -228,11 +230,19 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString samp
   TLegend *leg2 = new TLegend(0.43,0.78,0.73,0.88);
   leg2->SetFillColor(kWhite);
 
-  // Loop over samples
+  // Get histograms from individual root files
   for(UInt_t iS=0; iS<nDS; iS++) {
 
-    hDen[iS] = (TH1F*) fread->Get("hDen_"+nameDS[iS]);
-    hNum[iS] = (TH1F*) fread->Get("hNum_"+nameDS[iS]);
+    fpath[iS] = plotDir + "/" + version + "/histos_"+era+"_"+nameDS[iS]+".root";
+    fread[iS] = new TFile(fpath[iS] , "read");
+
+    if(fread[iS]->IsZombie()) {
+      cout << "-- ERROR: file not found (" << fpath[iS] << ")" << endl;
+      continue;
+    }
+
+    hDen[iS] = (TH1F*) fread[iS]->Get("hDen_"+nameDS[iS]);
+    hNum[iS] = (TH1F*) fread[iS]->Get("hNum_"+nameDS[iS]);
 
     if(!hDen[iS]) {
       cout << "-- ERROR: " << "hDen_"+nameDS[iS] << " not found! continue;" << endl;
@@ -243,6 +253,10 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString samp
       cout << "-- ERROR: " << "hNum_"+nameDS[iS] << " not found! continue;" << endl;
       continue;
     }    
+
+  } // end loop: root files
+
+  for(UInt_t iS=0; iS<nDS; iS++) {
 
     /// plot numerator and denominator for current process
     c1->cd();
@@ -272,30 +286,34 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString samp
 
       c->cd();
       teff[iS]->Draw("");
+      //
       c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+".png", "png");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+".pdf", "pdf");
+      gPad->SetLogx(kTRUE);
+      c->Update();
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_logx.png", "png");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_logx.pdf", "pdf");
+      gPad->SetLogx(kFALSE);
 
       c2->cd();
       teff[iS]->SetTitle(theAxes);
       if(iS==0) teff[iS]->Draw("");
-      else       teff[iS]->Draw("SAME");
+      else      teff[iS]->Draw("SAME");
 
       if(hNum[iS]->GetEntries()>0)
 	leg->AddEntry( teff[iS] , titleDS[iS] , "L" );
       leg->Draw();
       c2->Update();
 
-      cout << "-- I dare delete teff[iS] ! Beware the consequences." << endl;
-      delete teff[iS];
-      cout << "-- I deleted it !" << endl;
-    } //endif: check consistency
+    } //endif: check TEff TH1 consistency
 
     /// plot efficiency ratios
     if(iS>0) {
       cout << "-- Preparing ratio plot (iS=" << iS << ")" << endl;
-      if(hNum[0]) hRatio[iS] = (TH1F*) hNum[0]->Clone();
+      if(hNum[0]) hRatio[iS] = (TH1F*) hNum[0]->Clone("hratio_"+nameDS[iS]);
       else continue;
       //
-      hRatio[iS]->Sumw2();
+      //hRatio[iS]->Sumw2();
       //
       hRatio[iS]->SetTitle ("");
       hRatio[iS]->SetYTitle("HLT PFMNoMu120 Efficiency ratio");
@@ -320,22 +338,39 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString samp
       //
       c3->Update();
       //
-      delete hRatio[iS];
-    }
 
-    delete hNum[iS];
-    delete hDen[iS];
+    }
 
   } // end loop: samples
 
+  c2->cd();
   c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed.png", "png");
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed.pdf", "pdf");
+  gPad->SetLogx(kTRUE);
+  c2->Update();
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed_logx.png", "png");
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed_logx.pdf", "pdf");
+  gPad->SetLogx(kFALSE);
+
+  c3->cd();
   c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed.png", "png");
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed.pdf", "pdf");
+  gPad->SetLogx(kTRUE);
+  c3->Update();
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed_logx.png", "png");
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed_logx.pdf", "pdf");
+  gPad->SetLogx(kFALSE);
 
-  cout << "- I will now proceed with closing the TFile..." << endl;
-  fread->Close();  
-  cout << "- I closed it!" << endl;
+  for(UInt_t iS=0; iS<nDS; iS++) {
+    delete teff[iS];
+    if(hRatio[iS] && iS>0) 
+      delete hRatio[iS];
+    delete hNum[iS];
+    delete hDen[iS];    
+    fread[iS]->Close();  
+    delete fread[iS];
+  }
 
-  delete fread;
   delete c;
   delete c1;
   delete c2;
