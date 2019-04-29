@@ -26,7 +26,7 @@ typedef map< UInt_t , vector<ULong64_t> > MapLumiEvent;
 
 
 // Declare functions //
-Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t nDS, 
+Int_t plotEfficiency(TString plotDir, TString version, TString era, TString sample, const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS);
 
 Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC, TH1F* hDen, TH1F* hNum, 
@@ -91,7 +91,12 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 
     dirDS[0] = {"tree_SingleMuon_*.root"};
 
-    dirDS[1] = {"/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT100to200/treeProducerXtracks/tree.root"};
+    dirDS[1] = { "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT100to200/treeProducerXtracks/tree.root",
+		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT1200to2500/treeProducerXtracks/tree.root",
+		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT200to400/treeProducerXtracks/tree.root",
+		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT400to600/treeProducerXtracks/tree.root",
+		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT600to800/treeProducerXtracks/tree.root",
+		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT800to1200/treeProducerXtracks/tree.root" };
 
     dirDS[2] = {"/cmst3/user/amassiro/CMG/MC-CR1L-NewGeometry-Calibrated-and-Smeared-Correct/tree_DY*.root"};
 
@@ -106,8 +111,7 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
   TString plotDir = "plots/trigger/";
   TString fmode = "read";
   if(doReadChains) fmode = "recreate";
-  TFile *fout = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root", fmode);
-  fout->cd();
+  TFile *fout;
 
   // Define Histograms //
   TH1F*   hDen[ nDS];
@@ -121,31 +125,31 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 				   300,  350,  400,  500,  650, 
 				   800, 1000, 1300, 1600, 2000};
 
-  for(UInt_t iDS=0; iDS<nDS; iDS++) {
-
-    if(doConstantBinning) {
-      hDen[iDS] = new TH1F("hDen_"+nameDS[iDS], "Denominator ("+titleDS[iDS]+")",
-			   nBinsMet-1, 50, 2050);
-      hNum[iDS] = new TH1F("hNum_"+nameDS[iDS], "Numerator ("+titleDS[iDS]+")",
-			   nBinsMet-1, 50, 2050);
-    }
-
-    else {
-      hDen[iDS] = new TH1F("hDen_"+nameDS[iDS], "Denominator ("+titleDS[iDS]+")",
-			   nBinsMet-1, bins_met);
-      hNum[iDS] = new TH1F("hNum_"+nameDS[iDS], "Numerator ("+titleDS[iDS]+")",
-			   nBinsMet-1, bins_met);
-    }
-
-    hDen[iDS]->SetXTitle("PFMET NoMu (GeV)");
-    hNum[iDS]->SetXTitle("PFMET NoMu (GeV)");
-
-  }
-
-  // Process Data Sets //
   if(doReadChains) {
     for(UInt_t iS=0; iS<nDS; iS++) {
 
+      // Define output root file to store histograms
+      fout = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root", fmode);
+
+      // Define histograms
+      if(doConstantBinning) {
+	hDen[iS] = new TH1F("hDen_"+nameDS[iS], "Denominator ("+titleDS[iS]+")",
+			     nBinsMet-1, 50, 2050);
+	hNum[iS] = new TH1F("hNum_"+nameDS[iS], "Numerator ("+titleDS[iS]+")",
+			     nBinsMet-1, 50, 2050);
+      }
+
+      else {
+	hDen[iS] = new TH1F("hDen_"+nameDS[iS], "Denominator ("+titleDS[iS]+")",
+			     nBinsMet-1, bins_met);
+	hNum[iS] = new TH1F("hNum_"+nameDS[iS], "Numerator ("+titleDS[iS]+")",
+			     nBinsMet-1, bins_met);
+      }
+
+      hDen[iS]->SetXTitle("PFMET NoMu (GeV)");
+      hNum[iS]->SetXTitle("PFMET NoMu (GeV)");
+
+      // Process Data Sets //
       if(nameDS[iS]!=sample && sample!="all") continue;
 
       cout << endl << "-- Processing sample: " 
@@ -162,7 +166,7 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
       cout << endl;
 
       processChain(nEvents, chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], doCutOnMetFlags, doPrintBeforeCuts);
-      fout->cd();
+      if( !fout->IsZombie() ) fout->cd();
 
       cout << "-- writing histogram: " << hDen[iS]->GetName() << " (" << hDen[iS]->GetEntries() << " entries)" << endl;
       hDen[iS]->Sumw2();
@@ -172,31 +176,36 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
       hNum[iS]->Sumw2();
       hNum[iS]->Write();
 
+      // Delete pointers
+      if(hNum[iS]) delete hNum[iS];
+      if(hDen[iS]) delete hDen[iS];
+      delete chain[iS];
+
     }
 
-    fout->Write();
-    fout->Close();
+    if( !fout->IsZombie() ) fout->Write();
+    if( !fout->IsZombie() ) fout->Close();
+    delete fout;
   }
 
   // Plot efficiencies
   else {
-    plotEfficiency(plotDir, version, era, nDS, nameDS, titleDS, colorDS, styleDS);
+    plotEfficiency(plotDir, version, era, sample, nDS, nameDS, titleDS, colorDS, styleDS);
   }
-
 
   // END //
   return 0;
 }
 
 
-Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t nDS, 
+Int_t plotEfficiency(TString plotDir, TString version, TString era, TString sample, const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS)
 {
 
   // Open histogram file
-  TFile *fout = new TFile(plotDir + "/" + version + "/histos_"+era+".root", "read");
-  TH1F*   hDen[ nDS];
-  TH1F*   hNum[ nDS];
+  TFile* fread = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root" , "read");
+  TH1F*  hDen[nDS];
+  TH1F*  hNum[nDS];
   TEfficiency* teff[nDS];
   TString hTitle, theTitle, theAxes;
 
@@ -220,96 +229,121 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t
   leg2->SetFillColor(kWhite);
 
   // Loop over samples
-  for(UInt_t iDS=0; iDS<nDS; iDS++) {
+  for(UInt_t iS=0; iS<nDS; iS++) {
 
-    hDen[iDS] = (TH1F*) fout->Get("hDen_"+nameDS[iDS]);
-    hNum[iDS] = (TH1F*) fout->Get("hNum_"+nameDS[iDS]);
+    hDen[iS] = (TH1F*) fread->Get("hDen_"+nameDS[iS]);
+    hNum[iS] = (TH1F*) fread->Get("hNum_"+nameDS[iS]);
 
-    if(!hDen[iDS]) {
-      cout << "ERROR: " << "hDen_"+nameDS[iDS] << " not found! continue;" << endl;
+    if(!hDen[iS]) {
+      cout << "-- ERROR: " << "hDen_"+nameDS[iS] << " not found! continue;" << endl;
       continue;
     }
 
-    if(!hNum[iDS]) {
-      cout << "ERROR: " << "hNum_"+nameDS[iDS] << " not found! continue;" << endl;
+    if(!hNum[iS]) {
+      cout << "-- ERROR: " << "hNum_"+nameDS[iS] << " not found! continue;" << endl;
       continue;
     }    
 
     /// plot numerator and denominator for current process
     c1->cd();
     //
-    hNum[iDS]->SetLineColor(kRed);
-    hNum[iDS]->SetFillColor(kRed);
-    hDen[iDS]->SetLineColor(kBlue);
+    hNum[iS]->SetLineColor(kRed);
+    hNum[iS]->SetFillColor(kRed);
+    hDen[iS]->SetLineColor(kBlue);
     //
-    hDen[iDS]->Draw("H");
-    hNum[iDS]->Draw("HSAME");
+    hDen[iS]->Draw("H");
+    hNum[iS]->Draw("HSAME");
     //
     c1->Update();
-    c1->Print(plotDir + "/" + version + "/hist_"+nameDS[iDS]+".png", "png");
+    c1->Print(plotDir + "/" + version + "/hist_"+nameDS[iS]+".png", "png");
 
     /// plot efficiencies
-    if( TEfficiency::CheckConsistency(*hNum[iDS], *hDen[iDS]) ) {
+    if( TEfficiency::CheckConsistency(*hNum[iS], *hDen[iS]) ) {
 
-      teff[iDS] = new TEfficiency(*hNum[iDS], *hDen[iDS]);
+      teff[iS] = new TEfficiency(*hNum[iS], *hDen[iS]);
       theAxes   = ";PFMET NoMu (GeV);HLT PFMNoMu120 Efficiency";
-      theTitle  = titleDS[iDS] + theAxes;
-      teff[iDS]->SetTitle(theTitle);
-      //teff[iDS]->;
-      teff[iDS]->SetMarkerStyle(styleDS[iDS]);
-      teff[iDS]->SetMarkerColor(colorDS[iDS]);
-      teff[iDS]->SetLineColor  (colorDS[iDS]);
-      //teff[iDS]->SetMarkerSize(1);
+      theTitle  = titleDS[iS] + theAxes;
+      teff[iS]->SetTitle(theTitle);
+      //teff[iS]->;
+      teff[iS]->SetMarkerStyle(styleDS[iS]);
+      teff[iS]->SetMarkerColor(colorDS[iS]);
+      teff[iS]->SetLineColor  (colorDS[iS]);
+      //teff[iS]->SetMarkerSize(1);
 
       c->cd();
-      teff[iDS]->Draw("");
-      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iDS]+".png", "png");
+      teff[iS]->Draw("");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+".png", "png");
 
       c2->cd();
-      teff[iDS]->SetTitle(theAxes);
-      if(iDS==0) teff[iDS]->Draw("");
-      else       teff[iDS]->Draw("SAME");
+      teff[iS]->SetTitle(theAxes);
+      if(iS==0) teff[iS]->Draw("");
+      else       teff[iS]->Draw("SAME");
 
-      if(hNum[iDS]->GetEntries()>0)
-	leg->AddEntry( teff[iDS] , titleDS[iDS] , "L" );
+      if(hNum[iS]->GetEntries()>0)
+	leg->AddEntry( teff[iS] , titleDS[iS] , "L" );
       leg->Draw();
       c2->Update();
-    }
+
+      cout << "-- I dare delete teff[iS] ! Beware the consequences." << endl;
+      delete teff[iS];
+      cout << "-- I deleted it !" << endl;
+    } //endif: check consistency
 
     /// plot efficiency ratios
-    if(iDS>0) {
-      hRatio[iDS] = (TH1F*) hNum[0]->Clone();
-      hRatio[iDS]->Sumw2();
+    if(iS>0) {
+      cout << "-- Preparing ratio plot (iS=" << iS << ")" << endl;
+      if(hNum[0]) hRatio[iS] = (TH1F*) hNum[0]->Clone();
+      else continue;
       //
-      hRatio[iDS]->SetTitle ("");
-      hRatio[iDS]->SetYTitle("HLT PFMNoMu120 Efficiency ratio");
-      hRatio[iDS]->SetStats(kFALSE);
+      hRatio[iS]->Sumw2();
       //
-      hRatio[iDS]->SetMarkerStyle(styleDS[iDS]);
-      hRatio[iDS]->SetMarkerColor(colorDS[iDS]);
-      hRatio[iDS]->SetLineColor  (colorDS[iDS]);
+      hRatio[iS]->SetTitle ("");
+      hRatio[iS]->SetYTitle("HLT PFMNoMu120 Efficiency ratio");
+      hRatio[iS]->SetStats(kFALSE);
       //
-      hRatio[iDS]->Divide  (hDen[0]  );
-      hRatio[iDS]->Multiply(hDen[iDS]);
-      hRatio[iDS]->Divide  (hNum[iDS]);
+      hRatio[iS]->SetMarkerStyle(styleDS[iS]);
+      hRatio[iS]->SetMarkerColor(colorDS[iS]);
+      hRatio[iS]->SetLineColor  (colorDS[iS]);
+      //
+      hRatio[iS]->Divide  (hDen[0]  );
+      hRatio[iS]->Multiply(hDen[iS]);
+      hRatio[iS]->Divide  (hNum[iS]);
       //
       c3->cd();
       //
-      if(iDS>1) hRatio[iDS]->Draw("P");
-      else      hRatio[iDS]->Draw("PSAME");
+      if(iS==1) hRatio[iS]->Draw("P");
+      else      hRatio[iS]->Draw("PSAME");
       //
-      if(hRatio[iDS]->GetEntries()>0)
-	leg2->AddEntry( hRatio[iDS] , titleDS[iDS] , "L" );
+      if(hRatio[iS]->GetEntries()>0)
+	leg2->AddEntry( hRatio[iS] , titleDS[iS] , "L" );
       leg2->Draw();
       //
       c3->Update();
+      //
+      delete hRatio[iS];
     }
+
+    delete hNum[iS];
+    delete hDen[iS];
 
   } // end loop: samples
 
   c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed.png", "png");
   c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed.png", "png");
 
+  cout << "- I will now proceed with closing the TFile..." << endl;
+  fread->Close();  
+  cout << "- I closed it!" << endl;
+
+  delete fread;
+  delete c;
+  delete c1;
+  delete c2;
+  delete c3;
+  delete leg;
+  delete leg2;
+
+  // End
   return 0;
 }
 
