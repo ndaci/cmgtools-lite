@@ -33,7 +33,9 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
 Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
 		   TChain* fChain, TString nameDS, Bool_t isMC, 
 		   TH1F* hDen, TH1F* hNum, 
-		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts);
+		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts,
+		   Bool_t DEBUG,
+		   TString plotDir, TString version);
 
 
 // MAIN //
@@ -42,7 +44,7 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 	   TString lep="1mu"           , TString hltSel="PFMNoMu120",
 	   Int_t nEvents=-1, 
 	   Bool_t doCutOnMetFlags=kTRUE, Bool_t doPrintBeforeCuts=kTRUE,
-	   Bool_t doConstantBinning=kFALSE)
+	   Bool_t doConstantBinning=kFALSE, Bool_t DEBUG=kFALSE)
 {
 
   // Data Sets //
@@ -190,7 +192,8 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 
       processChain(nEvents, lep, hltSel, 
 		   chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], 
-		   doCutOnMetFlags, doPrintBeforeCuts);
+		   doCutOnMetFlags, doPrintBeforeCuts, DEBUG,
+		   plotDir, version);
 
       if( !fout->IsZombie() ) fout->cd();
 
@@ -410,16 +413,17 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
   return 0;
 }
 
-
 Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
 		   TChain* fChain, TString nameDS, Bool_t isMC, 
 		   TH1F* hDen, TH1F* hNum, 
-		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts)
+		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts,
+		   Bool_t DEBUG,
+		   TString plotDir, TString version)
 {
 
   // Log file
-  ofstream outlog("log_trigger_"+lep+"_"+nameDS+".txt", ios::out); 
-  ofstream outmap("map_trigger_"+lep+"_"+nameDS+".txt", ios::out); 
+  ofstream outlog(plotDir+"/"+version+"/log_trigger_"+lep+"_"+nameDS+".txt", ios::out); 
+  ofstream outmap(plotDir+"/"+version+"/map_trigger_"+lep+"_"+nameDS+".txt", ios::out); 
 
   // Map selected events
   MapLumiEvent mapEvents; // < lumi , <events> >
@@ -780,10 +784,15 @@ Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
   // Loop over the chain //
   UInt_t nEntries   = fChain->GetEntries();
   UInt_t nToProcess = nEvents;
+  Bool_t doPrintOut = DEBUG;
+
   if(nEvents<0 || nEvents>(Int_t)nEntries) nToProcess = nEntries;
 
   cout << "- About to process: " << nToProcess << " entries." << endl;
   for(UInt_t iE=0; iE<nToProcess; iE++) {
+
+    // Control printouts
+    doPrintOut = DEBUG || (iE%10000==0);
 
     // Initialize HLT bit variables
     HLT_BIT_HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_PFHT60_v = 0 ;
@@ -810,7 +819,7 @@ Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
 
     // Get entry #iE    
     fChain->GetEntry(iE);
-    if(iE%10000==0) {
+    if(doPrintOut) {
       cout << "-- Processing entry #" << iE << " / " << nEntries << endl;
     }
 
@@ -875,7 +884,7 @@ Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
 
     
     // 2- Print-out leading-jet search
-    if( doPrintBeforeCuts && (iE%10000==0 || iMax>=NJET || foundPathologicalJet>=0) ) {
+    if( doPrintBeforeCuts && (doPrintOut || iMax>=NJET || foundPathologicalJet>=0) ) {
 
       cout << "----------------------------------------" 
 	   << endl
@@ -981,65 +990,69 @@ Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
     nEventCount[6]++ ;
 
     //// Intermediate printout
-    outlog << "Run: " << run << " Lumi: " << lumi << " Event: " << evt << endl << endl;
+    if(doPrintOut) {
+      outlog << "Run: " << run << " Lumi: " << lumi << " Event: " << evt << endl << endl;
 
-    ///// Loop over preselected central jets
-    for(UInt_t idxJ=0; idxJ<idxJetID.size(); idxJ++) {
+      ///// Loop over preselected central jets
+      for(UInt_t idxJ=0; idxJ<idxJetID.size(); idxJ++) {
 
-      // break this loop if we reached forward jets
-      if(idxJetID[idxJ].second) break; 
+	// break this loop if we reached forward jets
+	if(idxJetID[idxJ].second) break; 
 
-      UInt_t iJ = idxJetID[idxJ].first;
+	UInt_t iJ = idxJetID[idxJ].first;
 
-      outlog << "pt: "   << Jet_pt[iJ]    << "\teta: "      << Jet_eta[iJ]   << endl
-	     << "phi: "  << Jet_phi[iJ]   << "\tf_CH: "     << Jet_chHEF[iJ] << endl
-	     << "f_NE: " << Jet_neHEF[iJ] << "\tforward: 0" << endl;
+	outlog << "pt: "   << Jet_pt[iJ]    << "\teta: "      << Jet_eta[iJ]   << endl
+	       << "phi: "  << Jet_phi[iJ]   << "\tf_CH: "     << Jet_chHEF[iJ] << endl
+	       << "f_NE: " << Jet_neHEF[iJ] << "\tforward: 0" << endl;
 
-      if(iJ==iMax) outlog << "=> LEADING JET" << endl;
+	if(iJ==iMax) outlog << "=> LEADING JET" << endl;
 
-      if(Jet_pt[iJ]<=100)                outlog << "=> Fails cut: pT>100"    << endl;
-      if(TMath::Abs(Jet_eta[iJ]) >= 2.4) outlog << "=> Fails cut: |eta|<2.4" << endl;
+	if(Jet_pt[iJ]<=100)                outlog << "=> Fails cut: pT>100"    << endl;
+	if(TMath::Abs(Jet_eta[iJ]) >= 2.4) outlog << "=> Fails cut: |eta|<2.4" << endl;
 
-      if(Jet_neHEF[iJ]>=0.8) outlog << "=> Fails cut: NHEF<0.8" << endl;
-      if(Jet_chHEF[iJ]<=0.1) outlog << "=> Fails cut: CHEF>0.1" << endl;
+	if(Jet_neHEF[iJ]>=0.8) outlog << "=> Fails cut: NHEF<0.8" << endl;
+	if(Jet_chHEF[iJ]<=0.1) outlog << "=> Fails cut: CHEF>0.1" << endl;
 
-      outlog << endl;
+	outlog << endl;
+      }
+
+      ///// Loop over preselected forward jets
+      for(UInt_t idxJ=0; idxJ<idxJetID.size(); idxJ++) {
+
+	// go beyond central jets to reach forward jets
+	if(!idxJetID[idxJ].second) continue; 
+
+	UInt_t iJ = idxJetID[idxJ].first;
+
+	outlog << "pt: "   << JetFwd_pt[iJ]    << "\teta: "      << JetFwd_eta[iJ]   << endl
+	       << "phi: "  << JetFwd_phi[iJ]   << "\tf_CH: "     << JetFwd_chHEF[iJ] << endl
+	       << "f_NE: " << JetFwd_neHEF[iJ] << "\tforward: 1" << endl;
+
+	if(iJ==iMax) outlog << "=> LEADING JET" << endl;
+
+	if(JetFwd_pt[iJ]<=100)                outlog << "=> Fails cut: pT>100"    << endl;
+	if(TMath::Abs(JetFwd_eta[iJ]) >= 2.4) outlog << "=> Fails cut: |eta|<2.4" << endl;
+
+	if(JetFwd_neHEF[iJ]>=0.8) outlog << "=> Fails cut: NHEF<0.8" << endl;
+	if(JetFwd_chHEF[iJ]<=0.1) outlog << "=> Fails cut: CHEF>0.1" << endl;
+
+	outlog << endl;
+      }
+
+      ///// MET Flags
+      if(!Flag_goodVertices) outlog << "Fails MET Flag_goodVertices" << endl;
+      if(!Flag_BadPFMuonFilter)    outlog << "Fails MET Flag_BadPFMuonFilter" << endl;
+      if(!Flag_HBHENoiseIsoFilter) outlog << "Fails MET Flag_HBHENoiseIsoFilter" << endl;
+      if(!Flag_EcalDeadCellTriggerPrimitiveFilter) 
+	outlog << "Fails MET Flag_EcalDeadCellTriggerPrimitiveFilter" << endl;
+      if(!Flag_eeBadScFilter)             outlog << "Fails MET Flag_eeBadScFilter" << endl; 
+      if(!Flag_ecalBadCalibFilter)        outlog << "Fails MET Flag_ecalBadCalibFilter" << endl;
+      if(!Flag_HBHENoiseFilter)           outlog << "Fails MET Flag_HBHENoiseFilter" << endl;
+      if(!Flag_globalTightHalo2016Filter) outlog << "Fails MET Flag_globalTightHalo2016Filter" << endl;
+      //
+      outlog << endl << endl;
     }
-
-    ///// Loop over preselected forward jets
-    for(UInt_t idxJ=0; idxJ<idxJetID.size(); idxJ++) {
-
-      // go beyond central jets to reach forward jets
-      if(!idxJetID[idxJ].second) continue; 
-
-      UInt_t iJ = idxJetID[idxJ].first;
-
-      outlog << "pt: "   << JetFwd_pt[iJ]    << "\teta: "      << JetFwd_eta[iJ]   << endl
-	     << "phi: "  << JetFwd_phi[iJ]   << "\tf_CH: "     << JetFwd_chHEF[iJ] << endl
-	     << "f_NE: " << JetFwd_neHEF[iJ] << "\tforward: 1" << endl;
-
-      if(iJ==iMax) outlog << "=> LEADING JET" << endl;
-
-      if(JetFwd_pt[iJ]<=100)                outlog << "=> Fails cut: pT>100"    << endl;
-      if(TMath::Abs(JetFwd_eta[iJ]) >= 2.4) outlog << "=> Fails cut: |eta|<2.4" << endl;
-
-      if(JetFwd_neHEF[iJ]>=0.8) outlog << "=> Fails cut: NHEF<0.8" << endl;
-      if(JetFwd_chHEF[iJ]<=0.1) outlog << "=> Fails cut: CHEF>0.1" << endl;
-
-      outlog << endl;
-    }
-
-    ///// MET Flags
-    if(!Flag_goodVertices) outlog << "Fails MET Flag_goodVertices" << endl;
-    if(!Flag_BadPFMuonFilter)    outlog << "Fails MET Flag_BadPFMuonFilter" << endl;
-    if(!Flag_HBHENoiseIsoFilter) outlog << "Fails MET Flag_HBHENoiseIsoFilter" << endl;
-    if(!Flag_EcalDeadCellTriggerPrimitiveFilter) outlog << "Fails MET Flag_EcalDeadCellTriggerPrimitiveFilter" << endl;
-    if(!Flag_eeBadScFilter)             outlog << "Fails MET Flag_eeBadScFilter" << endl; 
-    if(!Flag_ecalBadCalibFilter)        outlog << "Fails MET Flag_ecalBadCalibFilter" << endl;
-    if(!Flag_HBHENoiseFilter)           outlog << "Fails MET Flag_HBHENoiseFilter" << endl;
-    if(!Flag_globalTightHalo2016Filter) outlog << "Fails MET Flag_globalTightHalo2016Filter" << endl;
-    //
-    outlog << endl << endl;
+    ////// end intermediate printout
 
     //// Leading jet
     if(leadJetIsFwd) continue;
@@ -1099,6 +1112,12 @@ Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
     
     //
     if(hltCondition) hNum->Fill(metNoMu_pt);
+    else if( metNoMu_pt>=800 ) { // investigate on inefficient events
+      outlog << "INEFF: (run,lumi,event)=(" 
+	     << run << "," << lumi << "," << evt 
+	     << ") | metNoMu_pt=" << metNoMu_pt
+	     << endl;
+    }
 
   } // end loop: entries
 
@@ -1116,22 +1135,25 @@ Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
   // 	 << "\t(" << nameStep[i] << ")" << endl;
 
   // Printout map of selected events
-  lumi = 0;
-  vEvents.clear();
-  //
-  for(itMapEvents = mapEvents.begin(); 
-      itMapEvents != mapEvents.end() ; 
-      itMapEvents++) {
+  if(DEBUG) {
+    lumi = 0;
+    vEvents.clear();
+    //
+    for(itMapEvents = mapEvents.begin(); 
+	itMapEvents != mapEvents.end() ; 
+	itMapEvents++) {
 
-    lumi    = itMapEvents->first;
-    vEvents = itMapEvents->second;
-    sort(vEvents.begin(), vEvents.end()); 
+      lumi    = itMapEvents->first;
+      vEvents = itMapEvents->second;
+      sort(vEvents.begin(), vEvents.end()); 
 
-    for(UInt_t iE=0; iE<vEvents.size(); iE++) {
-      outmap << lumi << ":" << vEvents[iE] << endl;
+      for(UInt_t iE=0; iE<vEvents.size(); iE++) {
+	outmap << lumi << ":" << vEvents[iE] << endl;
+      }
     }
-  }
 
+  } // end printout map of selected events
 
+  // END //
   return 0;
 }
