@@ -30,7 +30,8 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
 		     const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS);
 
-Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, Bool_t isMC, 
+Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
+		   TChain* fChain, TString nameDS, Bool_t isMC, 
 		   TH1F* hDen, TH1F* hNum, 
 		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts);
 
@@ -38,7 +39,7 @@ Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, B
 // MAIN //
 Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE, 
 	   TString era="2018"          , TString sample="all",
-	   TString lep="1mu",
+	   TString lep="1mu"           , TString hltSel="PFMNoMu120",
 	   Int_t nEvents=-1, 
 	   Bool_t doCutOnMetFlags=kTRUE, Bool_t doPrintBeforeCuts=kTRUE,
 	   Bool_t doConstantBinning=kFALSE)
@@ -187,7 +188,10 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
       }
       cout << endl;
 
-      processChain(nEvents, lep, chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], doCutOnMetFlags, doPrintBeforeCuts);
+      processChain(nEvents, lep, hltSel, 
+		   chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], 
+		   doCutOnMetFlags, doPrintBeforeCuts);
+
       if( !fout->IsZombie() ) fout->cd();
 
       cout << "-- writing histogram: " << hDen[iS]->GetName() << " (" << hDen[iS]->GetEntries() << " entries)" << endl;
@@ -407,7 +411,8 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
 }
 
 
-Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, Bool_t isMC, 
+Int_t processChain(Int_t nEvents, TString lep, TString hltSel,
+		   TChain* fChain, TString nameDS, Bool_t isMC, 
 		   TH1F* hDen, TH1F* hNum, 
 		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts)
 {
@@ -766,6 +771,7 @@ Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, B
   Bool_t passDeltaPhi = kTRUE;
   Bool_t passMuon     = kFALSE;
   Bool_t passElectron = kFALSE;
+  Bool_t hltCondition = kFALSE;
 
   // < <index in array, isForward>
   vector< pair<UInt_t,Bool_t> > idxJetID;
@@ -1080,8 +1086,19 @@ Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, B
 
     // 5- Fill Histograms for trigger efficiencies
     hDen->Fill(metNoMu_pt);
-    if(HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight || HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v) 
-      hNum->Fill(metNoMu_pt);
+    //
+
+    hltCondition = (HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight   || 
+		    HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v );
+
+    if(hltSel=="NoMu120_OR_HT60")
+      hltCondition = (HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight          || 
+		      HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v        || 
+		      HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60   || 
+		      HLT_BIT_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60_v );
+    
+    //
+    if(hltCondition) hNum->Fill(metNoMu_pt);
 
   } // end loop: entries
 
