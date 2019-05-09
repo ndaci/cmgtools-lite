@@ -26,16 +26,19 @@ typedef map< UInt_t , vector<ULong64_t> > MapLumiEvent;
 
 
 // Declare functions //
-Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t nDS, 
+Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
+		     const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS);
 
-Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC, TH1F* hDen, TH1F* hNum, 
+Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, Bool_t isMC, 
+		   TH1F* hDen, TH1F* hNum, 
 		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts);
 
 
 // MAIN //
 Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE, 
 	   TString era="2018"          , TString sample="all",
+	   TString lep="1mu",
 	   Int_t nEvents=-1, 
 	   Bool_t doCutOnMetFlags=kTRUE, Bool_t doPrintBeforeCuts=kTRUE,
 	   Bool_t doConstantBinning=kFALSE)
@@ -44,8 +47,8 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
   // Data Sets //
   const UInt_t nDS=3;
   TChain* chain  [nDS];
-  TString nameDS [nDS] = {"data_1mu_"+era, "mc_wjets_"+era, "mc_zjets_"+era};
-  TString titleDS[nDS] = {"SingleMuon "+era, "W+Jets "+era, "DYJetsM50 "+era};
+  TString nameDS [nDS] = {"data_"+era, "mc_wjets_"+era, "mc_zjets_"+era};
+  TString titleDS[nDS] = {"Data "+era, "W+Jets "+era, "DYJetsM50 "+era};
   Int_t   colorDS[nDS] = {kBlack, kBlue, kRed};
   Int_t   styleDS[nDS] = {kFullTriangleUp, kOpenCircle, kOpenSquare};
   // Int_t* colorDS, Int_t* styleDS
@@ -64,7 +67,12 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
     subDirMC   = "";
     suffixDir  = "/treeProducerXtracks/tree.root";
 
-    dirDS[0] = {"SingleMuon_Run2018A", "SingleMuon_Run2018B", "SingleMuon_Run2018C"};
+    if(lep=="1mu") {
+      dirDS[0] = {"SingleMuon_Run2018A", "SingleMuon_Run2018B", "SingleMuon_Run2018C"};
+    }
+    else if(lep=="1e") {
+      dirDS[0] = {"EGamma_Run2018A", "EGamma_Run2018B", "EGamma_Run2018C"};
+    }
 
     dirDS[1] = { "23April2019_Samples2018_Hadded/WJets_HT100to200/",
 		 "23April2019_Samples2018_Hadded/WJets_HT200to400/",
@@ -89,14 +97,27 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
     subDirMC   = "";
     suffixDir  = "";
 
-    dirDS[0] = {"tree_SingleMuon_*.root"};
+    if(lep=="1mu") {
+      dirDS[0] = { subDirData + "tree_SingleMuon_*.root" };
+    }
+    else if(lep=="1e") {
+      dirDS[0] = { 
+	"/group/phys_exotica/xtracks//30April2019_Samples2017_Hadded/SingleElectron_Run2017B_31Mar2018/treeProducerXtracks/tree.root",
+	"/group/phys_exotica/xtracks//30April2019_Samples2017_Hadded/SingleElectron_Run2017C_31Mar2018/treeProducerXtracks/tree.root",
+	"/group/phys_exotica/xtracks//30April2019_Samples2017_Hadded/SingleElectron_Run2017D_31Mar2018/treeProducerXtracks/tree.root",
+	"/group/phys_exotica/xtracks//30April2019_Samples2017_Hadded/SingleElectron_Run2017E_31Mar2018/treeProducerXtracks/tree.root",
+	"/group/phys_exotica/xtracks//30April2019_Samples2017_Hadded/SingleElectron_Run2017F_31Mar2018/treeProducerXtracks/tree.root" 
+      };
+    }
 
-    dirDS[1] = { "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT100to200/treeProducerXtracks/tree.root",
-		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT1200to2500/treeProducerXtracks/tree.root",
-		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT200to400/treeProducerXtracks/tree.root",
-		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT400to600/treeProducerXtracks/tree.root",
-		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT600to800/treeProducerXtracks/tree.root",
-		 "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT800to1200/treeProducerXtracks/tree.root" };
+    dirDS[1] = { 
+      "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT100to200/treeProducerXtracks/tree.root",
+      "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT1200to2500/treeProducerXtracks/tree.root",
+      "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT200to400/treeProducerXtracks/tree.root",
+      "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT400to600/treeProducerXtracks/tree.root",
+      "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT600to800/treeProducerXtracks/tree.root",
+      "/group/phys_exotica/xtracks/23April2019_Samples2017_Hadded/WJets_HT800to1200/treeProducerXtracks/tree.root" 
+    };
 
     dirDS[2] = {"/cmst3/user/amassiro/CMG/MC-CR1L-NewGeometry-Calibrated-and-Smeared-Correct/tree_DY*.root"};
 
@@ -132,7 +153,7 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
       if(nameDS[iS]!=sample && sample!="all") continue;
 
       // Define output root file to store histograms
-      fout = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+".root", fmode);
+      fout = new TFile(plotDir + "/" + version + "/histos_"+era+"_"+sample+"_"+lep+".root", fmode);
 
       // Define histograms
       if(doConstantBinning) {
@@ -158,15 +179,15 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
     
       chain[iS] = new TChain("tree");
       for(UInt_t iDS=0; iDS<dirDS[iS].size(); iDS++) {
-	if(mcDS[iS]) subDir = subDirMC;
-	else         subDir = subDirData;
+	//if(mcDS[iS]) subDir = subDirMC;
+	//else         subDir = subDirData;
 	fullPath = baseDir + subDir + dirDS[iS][iDS] + suffixDir;
 	cout << "--- add file: " << fullPath << endl;
 	chain[iS]->Add(fullPath);
       }
       cout << endl;
 
-      processChain(nEvents, chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], doCutOnMetFlags, doPrintBeforeCuts);
+      processChain(nEvents, lep, chain[iS], nameDS[iS], mcDS[iS], hDen[iS], hNum[iS], doCutOnMetFlags, doPrintBeforeCuts);
       if( !fout->IsZombie() ) fout->cd();
 
       cout << "-- writing histogram: " << hDen[iS]->GetName() << " (" << hDen[iS]->GetEntries() << " entries)" << endl;
@@ -191,7 +212,7 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 
   // Plot efficiencies
   else {
-    plotEfficiency(plotDir, version, era, nDS, nameDS, titleDS, colorDS, styleDS);
+    plotEfficiency(plotDir, version, era, lep, nDS, nameDS, titleDS, colorDS, styleDS);
   }
 
   // END //
@@ -199,7 +220,8 @@ Int_t loop(TString version="v0_test"   , Bool_t doReadChains=kTRUE,
 }
 
 
-Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t nDS, 
+Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
+		     const UInt_t nDS, 
 		     TString* nameDS, TString* titleDS,Int_t* colorDS, Int_t* styleDS)
 {
 
@@ -233,7 +255,7 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t
   // Get histograms from individual root files
   for(UInt_t iS=0; iS<nDS; iS++) {
 
-    fpath[iS] = plotDir + "/" + version + "/histos_"+era+"_"+nameDS[iS]+".root";
+    fpath[iS] = plotDir + "/" + version + "/histos_"+era+"_"+nameDS[iS]+"_"+lep+".root";
     fread[iS] = new TFile(fpath[iS] , "read");
 
     if(fread[iS]->IsZombie()) {
@@ -269,7 +291,7 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t
     hNum[iS]->Draw("HSAME");
     //
     c1->Update();
-    c1->Print(plotDir + "/" + version + "/hist_"+nameDS[iS]+".png", "png");
+    c1->Print(plotDir + "/" + version + "/hist_"+nameDS[iS]+"_"+lep+".png", "png");
 
     /// plot efficiencies
     if( TEfficiency::CheckConsistency(*hNum[iS], *hDen[iS]) ) {
@@ -287,12 +309,12 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t
       c->cd();
       teff[iS]->Draw("");
       //
-      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+".png", "png");
-      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+".pdf", "pdf");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_"+lep+".png", "png");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_"+lep+".pdf", "pdf");
       gPad->SetLogx(kTRUE);
       c->Update();
-      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_logx.png", "png");
-      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_logx.pdf", "pdf");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_"+lep+"_logx.png", "png");
+      c->Print(plotDir + "/" + version + "/eff_"+nameDS[iS]+"_"+lep+"_logx.pdf", "pdf");
       gPad->SetLogx(kFALSE);
 
       c2->cd();
@@ -343,22 +365,22 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t
 
   } // end loop: samples
 
-  c2->cd();
-  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed.png", "png");
-  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed.pdf", "pdf");
+  c2->cd(); // "_"+lep+ 
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_"+lep+"_overlayed.png", "png");
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_"+lep+"_overlayed.pdf", "pdf");
   gPad->SetLogx(kTRUE);
   c2->Update();
-  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed_logx.png", "png");
-  c2->Print(plotDir + "/" + version + "/eff_"+era+"_overlayed_logx.pdf", "pdf");
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_"+lep+"_overlayed_logx.png", "png");
+  c2->Print(plotDir + "/" + version + "/eff_"+era+"_"+lep+"_overlayed_logx.pdf", "pdf");
   gPad->SetLogx(kFALSE);
 
   c3->cd();
-  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed.png", "png");
-  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed.pdf", "pdf");
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_"+lep+"_overlayed.png", "png");
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_"+lep+"_overlayed.pdf", "pdf");
   gPad->SetLogx(kTRUE);
   c3->Update();
-  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed_logx.png", "png");
-  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_overlayed_logx.pdf", "pdf");
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_"+lep+"_overlayed_logx.png", "png");
+  c3->Print(plotDir + "/" + version + "/ratio_"+era+"_"+lep+"_overlayed_logx.pdf", "pdf");
   gPad->SetLogx(kFALSE);
 
   for(UInt_t iS=0; iS<nDS; iS++) {
@@ -383,13 +405,14 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, const UInt_t
 }
 
 
-Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC, 
-		   TH1F* hDen, TH1F* hNum, Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts)
+Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, Bool_t isMC, 
+		   TH1F* hDen, TH1F* hNum, 
+		   Bool_t doCutOnMetFlags, Bool_t doPrintBeforeCuts)
 {
 
   // Log file
-  ofstream outlog("log_trigger_"+nameDS+".txt", ios::out); 
-  ofstream outmap("map_trigger_"+nameDS+".txt", ios::out); 
+  ofstream outlog("log_trigger_"+lep+"_"+nameDS+".txt", ios::out); 
+  ofstream outmap("map_trigger_"+lep+"_"+nameDS+".txt", ios::out); 
 
   // Map selected events
   MapLumiEvent mapEvents; // < lumi , <events> >
@@ -884,15 +907,30 @@ Int_t processChain(Int_t nEvents, TChain* fChain, TString nameDS, Bool_t isMC,
     // 4- Level-1 Selection Cuts //
 
     //// Single lepton selection
-    if(!HLT_SingleMu) continue;
+    if(lep=="1mu") {
+      if(!HLT_SingleMu) continue;
+    }
+    else if(lep=="1e") {
+      if(!HLT_SingleEl) continue;
+    }
     nEventCount[0]++ ;
 
-    ///// FIXME: add electron veto for singlemu data
+    ///// FIXME: add other-lepton veto?
     passMuon = kFALSE;
-    for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
-      if(TMath::Abs(LepGood_pdgId[iL])==13 && LepGood_pt[iL]>25)
-	passMuon = kTRUE;
+
+    if(lep=="1mu") {
+      for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
+	if(TMath::Abs(LepGood_pdgId[iL])==13 && LepGood_pt[iL]>25)
+	  passMuon = kTRUE;
+      }
     }
+    else if(lep=="1e") {
+      for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
+	if(TMath::Abs(LepGood_pdgId[iL])==11 && LepGood_pt[iL]>40)
+	  passMuon = kTRUE;
+      }
+    }
+
     if(!passMuon) continue;
     nEventCount[1]++ ;
 
