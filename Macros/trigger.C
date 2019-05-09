@@ -318,9 +318,11 @@ Int_t plotEfficiency(TString plotDir, TString version, TString era, TString lep,
       gPad->SetLogx(kFALSE);
 
       c2->cd();
-      teff[iS]->SetTitle(theAxes);
-      if(iS==0) teff[iS]->Draw("");
-      else      teff[iS]->Draw("SAME");
+      if(teff[iS]) {
+	teff[iS]->SetTitle(theAxes);
+	if(iS==0) teff[iS]->Draw("");
+	else      teff[iS]->Draw("SAME");
+      }
 
       if(hNum[iS]->GetEntries()>0)
 	leg->AddEntry( teff[iS] , titleDS[iS] , "L" );
@@ -762,7 +764,8 @@ Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, B
   Int_t   foundPathologicalJet = -1;
   Bool_t leadJetIsFwd = kFALSE;
   Bool_t passDeltaPhi = kTRUE;
-  Bool_t passMuon = kFALSE;
+  Bool_t passMuon     = kFALSE;
+  Bool_t passElectron = kFALSE;
 
   // < <index in array, isForward>
   vector< pair<UInt_t,Bool_t> > idxJetID;
@@ -917,21 +920,24 @@ Int_t processChain(Int_t nEvents, TString lep, TChain* fChain, TString nameDS, B
 
     ///// FIXME: add other-lepton veto?
     passMuon = kFALSE;
+    for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
+      if(TMath::Abs(LepGood_pdgId[iL])==13 && LepGood_pt[iL]>25)
+	passMuon = kTRUE;
+    }
+
+    passElectron = kFALSE;
+    for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
+      if(TMath::Abs(LepGood_pdgId[iL])==11 && LepGood_pt[iL]>40)
+	passElectron = kTRUE;
+    }
 
     if(lep=="1mu") {
-      for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
-	if(TMath::Abs(LepGood_pdgId[iL])==13 && LepGood_pt[iL]>25)
-	  passMuon = kTRUE;
-      }
+      if(!passMuon ||   passElectron ) continue;
     }
     else if(lep=="1e") {
-      for(UInt_t iL=0; iL<NLEP && (Int_t)iL<nLepGood; iL++) { 
-	if(TMath::Abs(LepGood_pdgId[iL])==11 && LepGood_pt[iL]>40)
-	  passMuon = kTRUE;
-      }
+      if( passMuon  || !passElectron ) continue;
     }
 
-    if(!passMuon) continue;
     nEventCount[1]++ ;
 
     //// MET flags
